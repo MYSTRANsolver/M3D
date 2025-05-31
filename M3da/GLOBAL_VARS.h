@@ -29,8 +29,8 @@ extern Symbol* pSymTable[10000];
 extern int gDIM_PREC;
 extern double gDIM_SIZE;
 extern int gCUR_RES;
-extern double gDRILL_KS;          //K value for shell drilling
-extern double gRIGID_MULTIPLIER;  //multiplier to factor psuedo rigid elemenys K values
+extern double gDRILL_KS; // K value for shell drilling
+extern double gRIGID_MULTIPLIER; // multiplier to factor psuedo rigid elemenys K values
 extern double gVSTIFF_KS;
 extern double gDEF_E;
 extern double gDEF_V;
@@ -42,6 +42,6 @@ extern double gDEF_THERM_LNK;
 extern double gDEF_SOL_TOL;
 extern PropTable* PropsT;
 extern MatTable* MatT;
-//Esp_Mod_Labels_4_27_2025_Start: Added global var for label display
+// Esp_Mod_Labels_4_27_2025_Start: Added global var for label display
 extern bool gLBL_DSP_TRG;
-//Esp_Mod_Labels_4_27_2025_End
+// Esp_Mod_Labels_4_27_2025_End

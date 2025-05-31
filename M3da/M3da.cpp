@@ -10,33 +10,29 @@
 #include "M3daDoc.h"
 #include "M3daView.h"
 
-//Esp_Mod_Config_File_Mod_Start
+// Esp_Mod_Config_File_Mod_Start
 #include "GLOBAL_VARS.h"
-//Esp_Mod_Config_File_Mod_End
+// Esp_Mod_Config_File_Mod_End
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-
 // CM3daApp
 
 BEGIN_MESSAGE_MAP(CM3daApp, CWinAppEx)
-	ON_COMMAND(ID_APP_ABOUT, &CM3daApp::OnAppAbout)
-	// Standard file based document commands
-	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
-	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
-	// Standard print setup command
-	ON_COMMAND(ID_FILE_PRINT_SETUP, &CWinAppEx::OnFilePrintSetup)
-	ON_COMMAND(ID_FILE_RUNSCRIPTFILE, &CM3daApp::OnFileRunscriptfile)
+ON_COMMAND(ID_APP_ABOUT, &CM3daApp::OnAppAbout)
+// Standard file based document commands
+ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
+ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
+// Standard print setup command
+ON_COMMAND(ID_FILE_PRINT_SETUP, &CWinAppEx::OnFilePrintSetup)
+ON_COMMAND(ID_FILE_RUNSCRIPTFILE, &CM3daApp::OnFileRunscriptfile)
 END_MESSAGE_MAP()
-
 
 // CM3daApp construction
 
-CM3daApp::CM3daApp()
-{
-
+CM3daApp::CM3daApp() {
 	m_bHiColorIcons = TRUE;
 
 	// TODO: add construction code here,
@@ -51,182 +47,111 @@ CM3daApp theApp;
 
 // {A7226713-7CA7-4243-8B24-4C7AA36D1FA3}
 static const CLSID clsid =
-{ 0xA7226713, 0x7CA7, 0x4243, { 0x8B, 0x24, 0x4C, 0x7A, 0xA3, 0x6D, 0x1F, 0xA3 } };
+    {0xA7226713, 0x7CA7, 0x4243, {0x8B, 0x24, 0x4C, 0x7A, 0xA3, 0x6D, 0x1F, 0xA3}};
 
 const GUID CDECL BASED_CODE _tlid =
-		{ 0x28298EED, 0x2921, 0x46EF, { 0x91, 0x77, 0x73, 0x8, 0x5F, 0x11, 0x18, 0x28 } };
+    {0x28298EED, 0x2921, 0x46EF, {0x91, 0x77, 0x73, 0x8, 0x5F, 0x11, 0x18, 0x28}};
 const WORD _wVerMajor = 1;
 const WORD _wVerMinor = 0;
 
-//Esp_Mod_Config_File_Mod_Start
+// Esp_Mod_Config_File_Mod_Start
 
 // Global variables for configuration settings
-void CM3daApp::LoadConfiguration()
-{
-    CStdioFile file;
-    if (file.Open(_T("config.txt"), CFile::modeRead | CFile::shareDenyWrite))
-    {
-        CString strLine;
-        while (file.ReadString(strLine))
-        {
-            strLine.Trim(); // Remove leading/trailing whitespace
+void CM3daApp::LoadConfiguration() {
+	CStdioFile file;
+	if (file.Open(_T("config.txt"), CFile::modeRead | CFile::shareDenyWrite)) {
+		CString strLine;
+		while (file.ReadString(strLine)) {
+			strLine.Trim(); // Remove leading/trailing whitespace
 
-            // Skip empty lines or comment lines that start with '*'
-            if (strLine.IsEmpty() || strLine.Left(1) == _T("*"))
-                continue;
+			// Skip empty lines or comment lines that start with '*'
+			if (strLine.IsEmpty() || strLine.Left(1) == _T("*"))
+				continue;
 
-            // Expecting "key, value" format
-            int commaPos = strLine.Find(_T(","));
-            if (commaPos != -1)
-            {
-                CString key = strLine.Left(commaPos);
-                CString value = strLine.Mid(commaPos + 1);
-                key.Trim();
-                value.Trim();
+			// Expecting "key, value" format
+			int commaPos = strLine.Find(_T(","));
+			if (commaPos != -1) {
+				CString key = strLine.Left(commaPos);
+				CString value = strLine.Mid(commaPos + 1);
+				key.Trim();
+				value.Trim();
 
-                // Update settings based on key
-                if (key.CompareNoCase(_T("background_color")) == 0)
-                {
-                	gBACKGRD_COL = _ttoi(value);
-                }
-                else if (key.CompareNoCase(_T("zoom_scale_factor")) == 0)
-                {
-	                gZOOM_SCL = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("point_size")) == 0)
-                {
-	                gPT_SIZE = _ttoi(value);
-                }
-                else if (key.CompareNoCase(_T("node_size")) == 0)
-                {
-	                gND_SIZE = _ttoi(value);
-                }
-                else if (key.CompareNoCase(_T("lump_mass_size")) == 0)
-                {
-	                gLM_SIZE = _ttoi(value);
-                }
-                else if (key.CompareNoCase(_T("element_edge_size")) == 0)
-                {
-	                gEL_SIZE = _ttoi(value);
-                }
-                else if (key.CompareNoCase(_T("free_edge_size")) == 0)
-                {
-	                gED_SIZE = _ttoi(value);
-                }
-                else if (key.CompareNoCase(_T("free_face_size")) == 0)
-                {
-	                gFC_SIZE = _ttoi(value);
-                }
-                else if (key.CompareNoCase(_T("workplane_line_weight")) == 0)
-                {
-	                gWP_SIZE = _ttoi(value);
-                }
-                else if (key.CompareNoCase(_T("beam_section_size")) == 0)
-                {
-	                gBM_SIZE = _ttoi(value);
-                }
-                else if (key.CompareNoCase(_T("text_size")) == 0)
-                {
-	                gTXT_SIZE = _ttoi(value);
-                }
-                else if (key.CompareNoCase(_T("drawing_scale_for_dims")) == 0)
-                {
-	                gDIM_SCALE = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("fillet_size")) == 0)
-                {
-	                gDIM_FILSZ = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("line_offset")) == 0)
-                {
-	                gDIM_OFFSZ = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("text_height")) == 0)
-                {
-	                gTXT_HEIGHT = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("circle_radius_for_circr")) == 0)
-                {
-	                gDIM_RADSZ = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("spline_order")) == 0)
-                {
-	                gDIM_CVORD = _ttoi(value);
-                }
-                else if (key.CompareNoCase(_T("dimesion_precision")) == 0)
-                {
-	                gDIM_PREC = _ttoi(value);
-                }
-                else if (key.CompareNoCase(_T("dimension_size")) == 0)
-                {
-	                gDIM_SIZE = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("trim_curve_on_surface_resolution")) == 0)
-                {
-	                gCUR_RES = _ttoi(value);
-                }
-                else if (key.CompareNoCase(_T("shell_drilling_k_value")) == 0)
-                {
-	                gDRILL_KS = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("stiffness_multiplier_for_m3d_dummy_rigid")) == 0)
-                {
-	                gRIGID_MULTIPLIER = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("k_for_restraints")) == 0)
-                {
-	                gVSTIFF_KS = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("default_material_E")) == 0)
-                {
-	                gDEF_E = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("default_material_v")) == 0)
-                {
-	                gDEF_V = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("default_material_density")) == 0)
-                {
-	                gDEF_DEN = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("default_material_thermal_conductivity")) == 0)
-                {
-	                gDEF_COND = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("default_siff_beam_diameter")) == 0)
-                {
-	                gSTIFF_BDIA = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("default_material_cte")) == 0)
-                {
-	                gDEF_CTE = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("default_thermal_link_coeff")) == 0)
-                {
-	                gDEF_THERM_LNK = _ttof(value);
-                }
-                else if (key.CompareNoCase(_T("default_iterative_solver_toleranace")) == 0)
-                {
-	                gDEF_SOL_TOL = _ttof(value);
-                }
-            }
-        }
-    	file.Close();
-    }
-    else
-    {
-	    AfxMessageBox(_T("Failed to open config.txt."));
-    }
+				// Update settings based on key
+				if (key.CompareNoCase(_T("background_color")) == 0) {
+					gBACKGRD_COL = _ttoi(value);
+				} else if (key.CompareNoCase(_T("zoom_scale_factor")) == 0) {
+					gZOOM_SCL = _ttof(value);
+				} else if (key.CompareNoCase(_T("point_size")) == 0) {
+					gPT_SIZE = _ttoi(value);
+				} else if (key.CompareNoCase(_T("node_size")) == 0) {
+					gND_SIZE = _ttoi(value);
+				} else if (key.CompareNoCase(_T("lump_mass_size")) == 0) {
+					gLM_SIZE = _ttoi(value);
+				} else if (key.CompareNoCase(_T("element_edge_size")) == 0) {
+					gEL_SIZE = _ttoi(value);
+				} else if (key.CompareNoCase(_T("free_edge_size")) == 0) {
+					gED_SIZE = _ttoi(value);
+				} else if (key.CompareNoCase(_T("free_face_size")) == 0) {
+					gFC_SIZE = _ttoi(value);
+				} else if (key.CompareNoCase(_T("workplane_line_weight")) == 0) {
+					gWP_SIZE = _ttoi(value);
+				} else if (key.CompareNoCase(_T("beam_section_size")) == 0) {
+					gBM_SIZE = _ttoi(value);
+				} else if (key.CompareNoCase(_T("text_size")) == 0) {
+					gTXT_SIZE = _ttoi(value);
+				} else if (key.CompareNoCase(_T("drawing_scale_for_dims")) == 0) {
+					gDIM_SCALE = _ttof(value);
+				} else if (key.CompareNoCase(_T("fillet_size")) == 0) {
+					gDIM_FILSZ = _ttof(value);
+				} else if (key.CompareNoCase(_T("line_offset")) == 0) {
+					gDIM_OFFSZ = _ttof(value);
+				} else if (key.CompareNoCase(_T("text_height")) == 0) {
+					gTXT_HEIGHT = _ttof(value);
+				} else if (key.CompareNoCase(_T("circle_radius_for_circr")) == 0) {
+					gDIM_RADSZ = _ttof(value);
+				} else if (key.CompareNoCase(_T("spline_order")) == 0) {
+					gDIM_CVORD = _ttoi(value);
+				} else if (key.CompareNoCase(_T("dimesion_precision")) == 0) {
+					gDIM_PREC = _ttoi(value);
+				} else if (key.CompareNoCase(_T("dimension_size")) == 0) {
+					gDIM_SIZE = _ttof(value);
+				} else if (key.CompareNoCase(_T("trim_curve_on_surface_resolution")) == 0) {
+					gCUR_RES = _ttoi(value);
+				} else if (key.CompareNoCase(_T("shell_drilling_k_value")) == 0) {
+					gDRILL_KS = _ttof(value);
+				} else if (key.CompareNoCase(_T("stiffness_multiplier_for_m3d_dummy_rigid")) == 0) {
+					gRIGID_MULTIPLIER = _ttof(value);
+				} else if (key.CompareNoCase(_T("k_for_restraints")) == 0) {
+					gVSTIFF_KS = _ttof(value);
+				} else if (key.CompareNoCase(_T("default_material_E")) == 0) {
+					gDEF_E = _ttof(value);
+				} else if (key.CompareNoCase(_T("default_material_v")) == 0) {
+					gDEF_V = _ttof(value);
+				} else if (key.CompareNoCase(_T("default_material_density")) == 0) {
+					gDEF_DEN = _ttof(value);
+				} else if (key.CompareNoCase(_T("default_material_thermal_conductivity")) == 0) {
+					gDEF_COND = _ttof(value);
+				} else if (key.CompareNoCase(_T("default_siff_beam_diameter")) == 0) {
+					gSTIFF_BDIA = _ttof(value);
+				} else if (key.CompareNoCase(_T("default_material_cte")) == 0) {
+					gDEF_CTE = _ttof(value);
+				} else if (key.CompareNoCase(_T("default_thermal_link_coeff")) == 0) {
+					gDEF_THERM_LNK = _ttof(value);
+				} else if (key.CompareNoCase(_T("default_iterative_solver_toleranace")) == 0) {
+					gDEF_SOL_TOL = _ttof(value);
+				}
+			}
+		}
+		file.Close();
+	} else {
+		AfxMessageBox(_T("Failed to open config.txt."));
+	}
 }
-//Esp_Mod_Config_File_Mod_End
-
-
-
+// Esp_Mod_Config_File_Mod_End
 
 // CM3daApp initialization
 
-BOOL CM3daApp::InitInstance()
-{
+BOOL CM3daApp::InitInstance() {
 	// InitCommonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
 	// visual styles.  Otherwise, any window creation will fail.
@@ -240,8 +165,7 @@ BOOL CM3daApp::InitInstance()
 	CWinAppEx::InitInstance();
 
 	// Initialize OLE libraries
-	if (!AfxOleInit())
-	{
+	if (!AfxOleInit()) {
 		AfxMessageBox(IDP_OLE_INIT_FAILED);
 		return FALSE;
 	}
@@ -254,7 +178,7 @@ BOOL CM3daApp::InitInstance()
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
-	LoadStdProfileSettings(4);  // Load standard INI file options (including MRU)
+	LoadStdProfileSettings(4); // Load standard INI file options (including MRU)
 
 	InitContextMenuManager();
 
@@ -264,31 +188,26 @@ BOOL CM3daApp::InitInstance()
 	CMFCToolTipInfo ttParams;
 	ttParams.m_bVislManagerTheme = TRUE;
 	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
-		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
+	                                             RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
 
 	////Esp_Mod_Config_File_Mod_Start//
 	// Check if "config.txt" exists in the working directory
 	CFileFind finder;
-	if (finder.FindFile(_T("config.txt")))
-	{
+	if (finder.FindFile(_T("config.txt"))) {
 		LoadConfiguration();
-	}
-	else
-	{
+	} else {
 		// TODO: If file no found, for example, set default values and make config.txt based on it
 	}
 	////Esp_Mod_Config_File_Mod_End//
-
-
 
 	// Register the application's document templates.  Document templates
 	//  serve as the connection between documents, frame windows and views
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
-		IDR_MAINFRAME,
-		RUNTIME_CLASS(CM3daDoc),
-		RUNTIME_CLASS(CMainFrame),       // main SDI frame window
-		RUNTIME_CLASS(CM3daView));
+	    IDR_MAINFRAME,
+	    RUNTIME_CLASS(CM3daDoc),
+	    RUNTIME_CLASS(CMainFrame), // main SDI frame window
+	    RUNTIME_CLASS(CM3daView));
 	if (!pDocTemplate)
 		return FALSE;
 	AddDocTemplate(pDocTemplate);
@@ -297,9 +216,8 @@ BOOL CM3daApp::InitInstance()
 	//  of requesting OLE containers by using information
 	//  specified in the document template
 	m_server.ConnectTemplate(clsid, pDocTemplate, TRUE);
-		// Note: SDI applications register server objects only if /Embedding
-		//   or /Automation is present on the command line
-
+	// Note: SDI applications register server objects only if /Embedding
+	//   or /Automation is present on the command line
 
 	// Enable DDE Execute open
 	EnableShellOpen();
@@ -311,36 +229,33 @@ BOOL CM3daApp::InitInstance()
 
 	// App was launched with /Embedding or /Automation switch.
 	// Run app as automation server.
-	if (cmdInfo.m_bRunEmbedded || cmdInfo.m_bRunAutomated)
-	{
+	if (cmdInfo.m_bRunEmbedded || cmdInfo.m_bRunAutomated) {
 		// Register all OLE server factories as running.  This enables the
 		//  OLE libraries to create objects from other applications
 		COleTemplateServer::RegisterAll();
 
 		// Don't show the main window
-		//return TRUE;
+		// return TRUE;
 	}
 	// App was launched with /Unregserver or /Unregister switch.  Unregister
 	// typelibrary.  Other unregistration occurs in ProcessShellCommand().
-	else if (cmdInfo.m_nShellCommand == CCommandLineInfo::AppUnregister)
-	{
+	else if (cmdInfo.m_nShellCommand == CCommandLineInfo::AppUnregister) {
 		UnregisterShellFileTypes();
 		m_server.UpdateRegistry(OAT_DISPATCH_OBJECT, NULL, NULL, FALSE);
 		AfxOleUnregisterTypeLib(_tlid, _wVerMajor, _wVerMinor);
 	}
 	// App was launched standalone or with other switches (e.g. /Register
 	// or /Regserver).  Update registry entries, including typelibrary.
-	else
-	{
-    COleTemplateServer::RegisterAll();
+	else {
+		COleTemplateServer::RegisterAll();
 		m_server.UpdateRegistry(OAT_DISPATCH_OBJECT);
 		COleObjectFactory::UpdateRegistryAll();
 		AfxOleRegisterTypeLib(AfxGetInstanceHandle(), _tlid);
 	}
-//Roy
-	//COleTemplateServer::RegisterAll();
-	//m_server.UpdateRegistry(OAT_DISPATCH_OBJECT);
-	//COleObjectFactory::UpdateRegistryAll();
+	// Roy
+	// COleTemplateServer::RegisterAll();
+	// m_server.UpdateRegistry(OAT_DISPATCH_OBJECT);
+	// COleObjectFactory::UpdateRegistryAll();
 
 	// Dispatch commands specified on the command line.  Will return FALSE if
 	// app was launched with /RegServer, /Register, /Unregserver or /Unregister.
@@ -358,13 +273,9 @@ BOOL CM3daApp::InitInstance()
 	return TRUE;
 }
 
-
-
 // CAboutDlg dialog used for App About
 
-int CM3daApp::ExitInstance()
-{
-
+int CM3daApp::ExitInstance() {
 	// If you initialized COM, uninitialize it
 	CoUninitialize();
 
@@ -372,101 +283,74 @@ int CM3daApp::ExitInstance()
 	return CWinAppEx::ExitInstance();
 }
 
+class CAboutDlg: public CDialog {
+	public:
+		CAboutDlg();
 
+		// Dialog Data
+		enum { IDD = IDD_ABOUTBOX };
 
+	protected:
+		virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 
-
-class CAboutDlg : public CDialog
-{
-public:
-	CAboutDlg();
-
-// Dialog Data
-	enum { IDD = IDD_ABOUTBOX };
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-	DECLARE_MESSAGE_MAP()
-public:
-
+		// Implementation
+	protected:
+		DECLARE_MESSAGE_MAP()
+	public:
 };
 
-CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
-{
+CAboutDlg::CAboutDlg()
+    : CDialog(CAboutDlg::IDD) {
 }
 
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
-{
+void CAboutDlg::DoDataExchange(CDataExchange* pDX) {
 	CDialog::DoDataExchange(pDX);
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
- 
+
 END_MESSAGE_MAP()
 
 // App command to run the dialog
-void CM3daApp::OnAppAbout()
-{
+void CM3daApp::OnAppAbout() {
 	CAboutDlg aboutDlg;
 	aboutDlg.DoModal();
 }
 
 // CM3daApp customization load/save methods
 
-void CM3daApp::PreLoadState()
-{
+void CM3daApp::PreLoadState() {
 	BOOL bNameValid;
 	CString strName;
 	bNameValid = strName.LoadString(IDS_EDIT_MENU);
-	//ASSERT(bNameValid);
+	// ASSERT(bNameValid);
 	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_EDIT);
 }
 
-void CM3daApp::LoadCustomState()
-{
+void CM3daApp::LoadCustomState() {
 }
 
-void CM3daApp::SaveCustomState()
-{
+void CM3daApp::SaveCustomState() {
 }
 
 // CM3daApp message handlers
 
-
-
-
-
-
-
-
-
-
-
-
-void CM3daApp::OnFileRunscriptfile()
-{
+void CM3daApp::OnFileRunscriptfile() {
 	// TODO: Add your command handler code here
 	char s1[200];
 	CString Cmd;
 
 	outtext1("RUN SCRIPT FILE");
 	FILE* pFile;
-	//TODO: Add your command handler code here
+	// TODO: Add your command handler code here
 	CFileDialog FDia(TRUE, "txt", "*.txt", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, NULL, NULL);
 	FDia.DoModal();
 	CString sPath = FDia.GetPathName();
 	CString sFile = FDia.GetFileName();
-	if (sFile != "")
-	{
+	if (sFile != "") {
 		pFile = fopen(sPath, "r");
-		if (pFile != NULL)
-		{
-
-			while (!feof(pFile))
-			{
+		if (pFile != NULL) {
+			while (!feof(pFile)) {
 				fgets(s1, 200, pFile);
 				Cmd = s1;
 				Cmd.Remove('\n');
