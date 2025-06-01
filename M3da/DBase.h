@@ -7,7 +7,10 @@
 
 // Note the version number has to be negative
 // so we can maintain compatability with older files
-const int VERSION_NO = -78;
+// MoMo_Start
+// MoMo// const int VERSION_NO = -78;
+const int VERSION_NO = -79;
+// MoMo_End
 const int MAX_GPS = 1000;
 const int MAX_TEMPGRP = 10000;
 
@@ -57,7 +60,10 @@ class DBase: public CCmdTarget {
 		void DeleteAll();
 		int DspFlags;
 		BOOL bPICK;
-		int iVER;
+		// MoMo_Start
+		// MoMo// int iVER;
+		int iVER = 0;
+		// MoMo_End
 		void ClearSymTable();
 		void AddSymbol(Symbol* pSym);
 		// Symbol* GetSymbol(int iLab);
@@ -418,6 +424,14 @@ class DBase: public CCmdTarget {
 		void GetCandiatesNodes2d(cSeg* pNot, ObjList* pFrom, C2dVector vC, double dCD, ObjList* pRes, double dSX, double dSY);
 
 		void CreateBSegs(ObjList* pP, cLinkedList* pS, double dS, NSurf* pSf);
+		// MoMo_Start
+		void CreateBSegs_EXP04(ObjList* pP, cLinkedList* pS, double dS, NSurf* pSf);
+		void AddOrRemoveTempSeeds_EXP04();
+		void ViewCurveSeeds(CString sMode, int tempSeedId, NCurve* curveIn);
+		void CalcTempSeeds_EXP04();
+		std::vector<double> BalancedSegs_EXP04(int n, double L, double L1, double Ln, double Lm);
+		void SaveOrResetTempSeeds_EXP04(CString sMode);
+		// MoMo_End
 		void GenPts(NSurf* pS, ObjList* Pts);
 		BOOL UpdateFront(NSurf* pSf, int& iNodeLab, int& iSegLab, BOOL isNewNd, cSeg* pBaseSeg, ObjList* Pts, cLinkedList* Segs, c2dParPt* pbFNd, C2dVector pTmp, ObjList* pEls);
 		eFaceList* GenTesselation(ObjList* pN, ObjList* pE);
@@ -431,11 +445,14 @@ class DBase: public CCmdTarget {
 		void MeshSurfSize(ObjList* pSurfs, double dS);
 		//****************  2d Advancing Front Auto Mesher ******************
 		void MeshSurfAF(ObjList* pSurfs, double dSz);
+		// MoMo_Start
+		void MeshSurfAF_EXP04();
+		// MoMo_End
 		//***************************************************************************
-		//                     EXPERIMENTAL QMORPH
-		// Cpnvert tri mesh to quads
-		// Advancing Front Quadrilateral Meshing Using Triangle Transformations
-		// Steven J. Owen1,2, Matthew L. Staten2, Scott A. Canann1,2 and Sunil Saigal1
+		//                      EXPERIMENTAL QMORPH
+		//  Cpnvert tri mesh to quads
+		//  Advancing Front Quadrilateral Meshing Using Triangle Transformations
+		//  Steven J. Owen1,2, Matthew L. Staten2, Scott A. Canann1,2 and Sunil Saigal1
 		//***************************************************************************
 		void QMorph(ObjList* Els);
 		//****************   Advancing Front 3d TET Mesher   ****************
@@ -534,6 +551,9 @@ class DBase: public CCmdTarget {
 		//***************************************************
 		void SetCurEType(int iEType);
 		int GetCurEType();
+		// MoMo_Start
+		double GetdTol();
+		// MoMo_End
 		C3dVector GetVPt();
 		C3dVector GetMeshCentre();
 		int GetMeshYExt();
@@ -561,6 +581,9 @@ class DBase: public CCmdTarget {
 		C3dVector DB_PtBuff[500];
 		int DB_BuffCount;
 		void DB_AddPtBuff(C3dVector InPT);
+		// MoMo_Start
+		virtual void DB_AddPtBuffById(C3dVector InPT, int tempSeedId);
+		// MoMo_End
 		void DB_Dellast();
 		void DB_ClearBuff();
 		C3dVector DB_GetBuffbyInd(int iInd);
@@ -732,14 +755,10 @@ class DBase: public CCmdTarget {
 		//***************************************************************************
 		C3dVector PickPointToGlobal2(CPoint Pt);
 		void ListMat(int MID, BOOL bPID);
-		// Saeed_Material_SaveBugV1_05_20_2025_Start
-		/*
-		//Saeed_Material_SaveBugV1_05_20_2025_End
-		void EditMat(int MID, BOOL bPID);
-		//Saeed_Material_SaveBugV1_05_20_2025_Start
-		*/
+		// MoMo_Material_FormKeysBugV1_05_22_2025_Start
+		// MoMo// void EditMat(int MID, BOOL bPID);
 		void EditMat(int MID, BOOL bPID, bool& materialIDFound);
-		// Saeed_Material_SaveBugV1_05_20_2025_End
+		// MoMo_Material_FormKeysBugV1_05_22_2025_End
 		void EditProp(int PID);
 		void ListProp(int PID);
 		void EditObject();

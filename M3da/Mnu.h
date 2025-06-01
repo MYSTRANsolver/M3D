@@ -12,6 +12,10 @@ class zMnu {
 		int RetVal;
 		int iResumePos;
 		int iCancelPos;
+		// MoMo_Start
+		int iNoPos;
+		int nCancel;
+		// MoMo_End
 		zMnu* pNext;
 		int iStat;
 		int initCnt;
@@ -52,6 +56,13 @@ class zSEL_Mnu: public zMnu {
 		virtual int DoMenu(CString CInMsg, CPoint Pt);
 };
 
+// MoMo_Start
+class zSEL_EXP04_Mnu: public zMnu {
+	public:
+		virtual int DoMenu(CString CInMsg, CPoint Pt);
+};
+// MoMo_End
+
 class zNDCR_Mnu: public zMnu {
 	public:
 		virtual int DoMenu(CString CInMsg, CPoint Pt);
@@ -71,6 +82,13 @@ class zKEY_Mnu: public zMnu {
 	public:
 		virtual int DoMenu(CString CInMsg, CPoint Pt);
 };
+
+// MoMo_Start
+class zKEY_EXP04_Mnu: public zMnu {
+	public:
+		virtual int DoMenu(CString CInMsg, CPoint Pt);
+};
+// MoMo_End
 
 class zLNX_Mnu: public zMnu {
 	public:
@@ -286,6 +304,20 @@ class zMMESHAF_Mnu: public zMnu {
 		int iCnt;
 		virtual int DoMenu(CString CInMsg, CPoint Pt);
 };
+
+// MoMo_Start
+class zEXP04_Mnu: public zMnu {
+	public:
+		int iCnt;
+		virtual int DoMenu(CString CInMsg, CPoint Pt);
+};
+
+class zEXP05_Mnu: public zMnu {
+	public:
+		int iCnt;
+		virtual int DoMenu(CString CInMsg, CPoint Pt);
+};
+// MoMo_End
 
 class zEXTRACT_Mnu: public zMnu {
 	public:

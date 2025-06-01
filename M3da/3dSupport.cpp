@@ -140,6 +140,9 @@ C3dVector::C3dVector() {
 	x = 1;
 	y = 1;
 	z = 1;
+	// MoMo_Start
+	tempSeedId = 0;
+	// MoMo_End
 }
 
 C3dVector::~C3dVector() {

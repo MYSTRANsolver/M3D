@@ -97,6 +97,10 @@ class CM3daDoc: public CDocument, public CUndo {
 		afx_msg void OnEditFilternone();
 		afx_msg void OnEditCancel();
 		afx_msg void OnEditDone();
+		// MoMo_Start
+		afx_msg void OnEditNo();
+		afx_msg void OnEditYes();
+		// MoMo_End
 		afx_msg void OnGroupAddtogroup();
 		afx_msg void OnGroupRemovefromgroup();
 		afx_msg void OnGroupAddgroup();

@@ -19,6 +19,18 @@ extern double gDIM_RADSZ;
 extern double gDIM_CVORD;
 extern BOOL gDSP_CPTS;
 extern BOOL gDSP_CIRS;
+// MoMo_Start
+struct SeedValues {
+		BOOL IsSeedMode = FALSE;
+		BOOL SelectSurface = TRUE;
+		BOOL SelectSurfaceCurves = FALSE;
+		BOOL SelectLock = FALSE;
+		double InputedMeshElementSize = 1.0;
+		int InputedSeedNumbers = 0;
+};
+extern SeedValues SeedVals;
+extern CString LastRequest;
+// MoMo_End
 extern BOOL gDSP_BACK;
 extern BOOL gORTHO;
 extern DSP_Triad tOrient;
@@ -42,6 +54,7 @@ extern double gDEF_THERM_LNK;
 extern double gDEF_SOL_TOL;
 extern PropTable* PropsT;
 extern MatTable* MatT;
+
 // Esp_Mod_Labels_4_27_2025_Start: Added global var for label display
 extern bool gLBL_DSP_TRG;
 // Esp_Mod_Labels_4_27_2025_End

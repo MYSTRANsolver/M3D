@@ -1,4 +1,4 @@
-
+﻿
 // M3da.cpp : Defines the class behaviors for the application.
 //
 
@@ -150,6 +150,8 @@ void CM3daApp::LoadConfiguration() {
 // Esp_Mod_Config_File_Mod_End
 
 // CM3daApp initialization
+
+// MoMo: program start from here (int main() or main.cpp)
 
 BOOL CM3daApp::InitInstance() {
 	// InitCommonControlsEx() is required on Windows XP if an application

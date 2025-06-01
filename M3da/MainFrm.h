@@ -1,10 +1,10 @@
-
+﻿
 // MainFrm.h : interface of the CMainFrame class
 //
 #include "InputPane.h"
-// Saeed_Material_SaveBugV1_05_20_2025_Start
+// MoMo_Material_SaveBugV1_05_20_2025_Start
 #include <vector>
-// Saeed_Material_SaveBugV1_05_20_2025_End
+// MoMo_Material_SaveBugV1_05_20_2025_End
 #pragma once
 
 class CMainFrame: public CFrameWndEx {
@@ -15,7 +15,9 @@ class CMainFrame: public CFrameWndEx {
 	public:
 		virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 		virtual BOOL LoadFrame(UINT nIDResource, DWORD dwDefaultStyle = WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, CWnd* pParentWnd = NULL, CCreateContext* pContext = NULL);
-		void sizeCbar();
+		// MoMo_Start
+		//  MoMo// void sizeCbar();
+		// MoMo_End
 		virtual ~CMainFrame();
 #ifdef _DEBUG
 		virtual void AssertValid() const;
@@ -58,4 +60,49 @@ class CMainFrame: public CFrameWndEx {
 		afx_msg void OnSize(UINT nType, int cx, int cy);
 		//  afx_msg void OnMeshFreetrimesh();
 		//  afx_msg void OnToolsElementmasssummation();
+		// MoMo_Start
+		CFont m_EditFont;
+		// MoMo_End
+
+	public:
+		inline void SetFontSpec(CFont& fontObj, int fontSize, CString fontName = _T("Tahoma"), bool isBold = false, CWnd* pCtrl = nullptr) {
+			if (fontObj.m_hObject != NULL)
+				fontObj.DeleteObject();
+
+			CClientDC dc(AfxGetMainWnd());
+			int nHeight = -MulDiv(fontSize, dc.GetDeviceCaps(LOGPIXELSY), 72);
+
+			fontObj.CreateFont(
+			    nHeight, 0, 0, 0,
+			    isBold ? FW_BOLD : FW_NORMAL,
+			    FALSE, FALSE, FALSE,
+			    DEFAULT_CHARSET,
+			    OUT_DEFAULT_PRECIS,
+			    CLIP_DEFAULT_PRECIS,
+			    DEFAULT_QUALITY,
+			    DEFAULT_PITCH | FF_SWISS,
+			    fontName);
+
+			if (pCtrl)
+				pCtrl->SetFont(&fontObj);
+		}
+
+		// MoMo_Start
+	public:
+		inline void GetCurrentFont(CEdit& editCtrl) {
+			LOGFONT lf;
+			CFont* pFont = editCtrl.GetFont();
+
+			if (pFont != nullptr) {
+				pFont->GetLogFont(&lf);
+				CString fontName(lf.lfFaceName);
+				int fontSize = abs(lf.lfHeight);
+				CString fontSizeStr;
+				fontSizeStr.Format(_T("%d"), fontSize);
+				AfxMessageBox(_T("Font: ") + fontName + _T(", Size: ") + fontSizeStr);
+			} else {
+				AfxMessageBox(_T("No font found!"));
+			}
+		}
+		// MoMo_End
 };

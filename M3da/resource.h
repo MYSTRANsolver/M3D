@@ -839,12 +839,17 @@
 #define ID_EXP03 33459
 #define ID_EXP04 33460
 #define ID_EXP05 33461
-#define ID_EXPERIMENTAL_EXP1 33462
-#define ID_EXPERIMENTAL_EXP3 33463
-#define ID_EXPERIMENTAL_EXP4 33464
-#define ID_EXPERIMENTAL_EXP5 33465
-#define ID_EXPERIMENTAL_EXP6 33466
-#define ID_EXPERIMENTAL_EXP2 33467
+// MoMo_Start
+// #define ID_EXPERIMENTAL_EXP1            33462
+// #define ID_EXPERIMENTAL_EXP2            33463
+// #define ID_EXPERIMENTAL_EXP3            33464
+// #define ID_EXPERIMENTAL_EXP4            33465
+// #define ID_EXPERIMENTAL_EXP5            33466
+// #define ID_EXPERIMENTAL_EXP6            33467
+#define ID_EDIT_NO 33468
+#define ID_EDIT_YES 33469
+// MoMo_End
+
 // Esp_Mod_Experimental_Toolbar_4_10_2025_End
 
 // Next default values for new objects

@@ -248,9 +248,25 @@ void CM3daView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags) {
 		GetDocument()->Draw(tOrient.RetrieveMat(), pDC, 4);
 		ReleaseDC(pDC);
 	} else if (m_iFuncKey == 4) {
-		outtextMSG2("D");
+		// MoMo_Start
+		if (!SeedVals.IsSeedMode) {
+			// MoMo_End
+			outtextMSG2("D");
+			// MoMo_Start
+		} else {
+			outtextMSG2("Done");
+		}
+		// MoMo_End
 	} else if (m_iFuncKey == 5) {
-		outtextMSG2("C");
+		// MoMo_Start
+		if (!SeedVals.IsSeedMode) {
+			// MoMo_End
+			outtextMSG2("C");
+			// MoMo_Start
+		} else {
+			outtextMSG2("Cancel");
+		}
+		// MoMo_End
 	} else if (m_iFuncKey == 6) {
 		GetDocument()->DeleteObjs();
 	} else {
@@ -335,6 +351,11 @@ void CM3daView::OnMouseMove(UINT nFlags, CPoint point) {
 		a = sqrt(b);
 		iMag = (int) a;
 		m_UpdateTriad(iMag);
+		// MoMo_Start
+		if (iMag > 0 && m_iFuncKey == 1) {
+			m_middleIsDraging = true;
+		}
+		// MoMo_End
 		m_PointOld = m_PointNew;
 		CDC* pDC = this->GetDC();
 		GetDocument()->SetView(this);
@@ -499,7 +520,22 @@ void CM3daView::OnMButtonUp(UINT nFlags, CPoint point) {
 
 	m_iFuncKey = 0;
 	CView::OnMButtonUp(nFlags, point);
-	outtextMSG2("D");
+
+	// MoMo_Start
+	if (!SeedVals.IsSeedMode) {
+		if (!m_middleIsDraging) {
+			// MoMo_End
+			outtextMSG2("D");
+			// MoMo_Start
+		}
+	} else {
+		if (!m_middleIsDraging) {
+			outtextMSG2("Done");
+		}
+		m_middleIsDraging = false;
+	}
+	// MoMo_End
+
 	CDC* pDC = this->GetDC();
 	GetDocument()->SetView(this);
 	GetDocument()->Draw(tOrient.RetrieveMat(), pDC, 4);

@@ -658,14 +658,10 @@ class Entity: public CObject {
 		                    int inPid,
 		                    int inType);
 		virtual void List();
-		// Saeed_Material_SaveBugV1_05_20_2025_Start
-		/*
-		//Saeed_Material_SaveBugV1_05_20_2025_End
-		void ListShort();
-		//Saeed_Material_SaveBugV1_05_20_2025_Start
-		*/
+		// MoMo_Material_SaveBugV1_05_20_2025_Start
+		// MoMo// void ListShort();
 		void ListShort(int iRow);
-		// Saeed_Material_SaveBugV1_05_20_2025_End
+		// MoMo_Material_SaveBugV1_05_20_2025_End
 		virtual void ExportNAS(FILE* pFile);
 		virtual Entity* Copy();
 		virtual int GetVarHeaders(CString sVar[]);
@@ -1316,10 +1312,16 @@ class CEntEditDialog: public CDialog {
 		CEdit Ed_Title;
 		CEdit Ed_ID;
 		CEdit* eEdit = NULL;
+		// MoMo_Material_FormKeysBugV1_05_22_2025_Start
+		// MoMo// int m_iItemBeingEdited;
 		int m_iItemBeingEdited = -1;
+		bool ShiftDown = false;
+		CString FormCaption = "";
+		// MoMo_Material_FormKeysBugV1_05_22_2025_End
 		int iNo = 0;
 		int iNo2 = 0;
 		BOOL bDel = FALSE;
+
 		Entity* pEnt = NULL;
 		G_Object* pO = NULL;
 		PropTable* PT = NULL;
@@ -1348,6 +1350,11 @@ class CEntEditDialog: public CDialog {
 		afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 		afx_msg void OnBnClickedCdelete();
 		afx_msg void OnBnClickedCancel();
+		// MoMo_Material_FormKeysBugV1_05_22_2025_Start
+		void eEditAppear(int nMode, TCHAR pressChar);
+		void eEditApply();
+		CString ValidateNumericInput(const CString& input);
+		// MoMo_Material_FormKeysBugV1_05_22_2025_End
 };
 
 // CPcompEditor dialog
@@ -1531,6 +1538,16 @@ class G_Object: public CCmdTarget {
 		int Selectable;
 		int Visable; // Object Visability
 		BOOL bDrawLab;
+		// MoMo_Start
+		int nSeeds = 0;
+		int nTempSeeds = 0;
+		bool seedChanged = false;
+		int tempSeedId = 0;
+		double realdL;
+		double realdLBefore;
+		double realdLNext;
+		// MoMo_End
+
 		void SetVisable(int iOnOff);
 		void SetSelectable(int iOnOff);
 		void SetDrawn(int iOnOff);
@@ -1595,6 +1612,10 @@ class cLinkedList: public G_Object {
 	public:
 		int iCnt;
 		G_Object* Head;
+		// MoMo_Start
+		int iCntInter;
+		G_Object* HeadInter;
+		// MoMo_End
 		G_Object* pCur;
 		CString sTitle;
 		cLinkedList();
@@ -1602,6 +1623,10 @@ class cLinkedList: public G_Object {
 		void Clear();
 		void DeleteAll();
 		void Add(G_Object* inItem);
+		// MoMo_Start
+		void CalcRealdLAllExter();
+		void CalcRealdLAllInter();
+		// MoMo_End
 		void AddEx(G_Object* inItem);
 		G_Object* IsIn(G_Object* inItem);
 		void RemNoDelete(G_Object* inItem);
@@ -2835,6 +2860,9 @@ class c2dParPt: public G_Object
 { // 2d Vector
 	public:
 		C2dVector PP;
+		// MoMo_Start
+		C3dVector pXY;
+		// MoMo_End
 		c2dParPt();
 		~c2dParPt();
 		c2dParPt(double x, double y);
@@ -2845,11 +2873,15 @@ class cSeg: public G_Object {
 		c2dParPt* pt[2];
 		C2dVector MpT;
 		double dL;
+
 		cSeg();
 		cSeg(G_Object* pP);
 		cSeg(G_Object* pP, double x1, double y1, double x2, double y2);
 		~cSeg();
 		void CalcMids();
+		// MoMo_Start
+		void CalcRealdL();
+		// MoMo_End
 		BOOL HasCommonVert(c2dParPt* p1, c2dParPt* p2);
 		// int isSameWithDir(cLink* inLink);
 		C2dVector Get_Mid();
@@ -3658,17 +3690,17 @@ class Table: public CObject {
 		~Table();
 		Entity* pEnts[MAX_ENTS];
 		int iNo;
-		// Saeed_Material_SaveBugV1_05_20_2025_Start
+		// MoMo_Material_SaveBugV1_05_20_2025_Start
 		bool isTemp = FALSE;
-		// Saeed_Material_SaveBugV1_05_20_2025_End
+		// MoMo_Material_SaveBugV1_05_20_2025_End
 		virtual void DeleteAll();
 		void Delete(Entity* pO);
 		virtual void AddItem(Entity* pIn);
 		virtual Entity* GetItem(int iID);
 		virtual int NextID();
-		// Saeed_Material_SaveBugV1_05_20_2025_Start
+		// MoMo_Material_SaveBugV1_05_20_2025_Start
 		virtual int OfferedID(int idIn, bool findNew, int newIdMode);
-		// Saeed_Material_SaveBugV1_05_20_2025_End
+		// MoMo_Material_SaveBugV1_05_20_2025_End
 		virtual void ListAll();
 		virtual void Serialize(CArchive& ar, int iV);
 		virtual void ExportNAS(FILE* pF, int iFileNo);

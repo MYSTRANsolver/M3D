@@ -404,6 +404,9 @@ DBase::DBase(double WPS) {
 	iMeshCnt = 0;
 	DB_Obj[DB_ObjectCount] = CreateMesh("WORK");
 	pCurrentMesh = (ME_Object*) DB_Obj[DB_ObjectCount];
+	// MoMo_Start
+	DB_Obj[DB_ObjectCount]->Selectable = 1;
+	// MoMo_End
 	DB_ObjectCount++;
 	pCurrentPart = NULL;
 	Dsp_All();
@@ -1031,6 +1034,9 @@ void DBase::Serialize(CArchive& ar) {
 	int iSecondaryType;
 	if (ar.IsStoring()) {
 		// TODO: add storing code here
+		// MoMo_Start
+		iVER = VERSION_NO;
+		// MoMo_End
 		ar << VERSION_NO;
 		ar << pModelMat.m_00;
 		ar << pModelMat.m_01;
@@ -1106,7 +1112,15 @@ void DBase::Serialize(CArchive& ar) {
 		}
 		SaveGps(ar);
 	} else {
+		// MoMo_Start
+		if (iVER != 0)
+			outtext1("");
+		// MoMo_End
 		ar >> iVER;
+		// MoMo_Start
+		char S1[200];
+		outtextSprintf("Version of Loaded File = %.2f", 0, abs(iVER / 10.0), false, 1);
+		// MoMo_End
 		if (iVER <= -66) {
 			C3dMatrix mT;
 			ar >> mT.m_00;
@@ -1248,6 +1262,7 @@ void DBase::Serialize(CArchive& ar) {
 						DB_Obj[i] = new NLine;
 					else
 						DB_Obj[i] = new NCurve;
+
 					DB_Obj[i]->Serialize(ar, iVER);
 					//
 					DB_Obj[i]->iObjType = iType;
@@ -1342,7 +1357,6 @@ void DBase::Serialize(CArchive& ar) {
 		SaveGps(ar);
 		pCurrentMesh = (ME_Object*) DB_Obj[1];
 		outtext1("Searching for Mesh.");
-		char S1[200];
 		if (iCurMesh != -1) {
 			for (i = 1; i < DB_ObjectCount; i++) {
 				if ((DB_Obj[i]->iObjType == 4) && (DB_Obj[i]->iLabel == iCurMesh)) {
@@ -1734,7 +1748,11 @@ void DBase::AddNode(C3dVector InPt, int iLab, int i2, int i3, int iC, int iDef, 
 	pCurrentMesh->iNodeLab++;
 	AddTempGraphics(cAddedNode);
 	Dsp_Add(cAddedNode);
-	ReDraw();
+	// MoMo_Start
+	if (!SeedVals.SelectSurfaceCurves) {
+		ReDraw();
+	}
+	// MoMo_End
 }
 
 C3dMatrix DBase::GetNodalSys(Node* pN) {
@@ -4399,8 +4417,9 @@ CvPt_Object* DBase::AddPt(C3dVector InPt, int iLab, BOOL bRedraw) {
 	pThePt->Create(InPt, 1, iPtLabCnt, 0, 0, 11, NULL);
 	iPtLabCnt++;
 	AddObj(pThePt);
-	if (bRedraw)
+	if (bRedraw) {
 		ReDraw();
+	}
 	return (pThePt);
 }
 
@@ -9621,14 +9640,10 @@ void DBase::AddStep(CString sT, int iLC, int iBC, int iTC, BOOL bRS) {
 }
 
 void DBase::ListAllMats() {
-	// Saeed_Material_SaveBugV1_05_20_2025_Start
-	/*
-	//Saeed_Material_SaveBugV1_05_20_2025_End
-	outtext1("MATERIAL LISTING:-");
-	//Saeed_Material_SaveBugV1_05_20_2025_Start
-	*/
+	// MoMo_Material_SaveBugV1_05_20_2025_Start
+	// MoMo// outtext1("MATERIAL LISTING:-");
 	outtext1(_T("\r\nMATERIAL LISTING:"));
-	// Saeed_Material_SaveBugV1_05_20_2025_End
+	// MoMo_Material_SaveBugV1_05_20_2025_End
 	if (pCurrentMesh != NULL) {
 		MatT->ListAll();
 	}
@@ -9831,11 +9846,32 @@ void DBase::SetPen(CDC* pDC, int iCol) {
 			iG = 0;
 			iB = 0;
 			break;
+			// MoMo_Start
+		case 101:
+			iR = 255;
+			iG = 0;
+			iB = 0;
+			break;
+		case 102:
+			iR = 34;
+			iG = 255;
+			iB = 76;
+			break;
+			// MoMo_End
 	}
 
 	if (pDC != NULL) {
-		pDC->SelectStockObject(NULL_BRUSH);
-		Pen = new CPen(PS_SOLID, 2, RGB(iR, iG, iB));
+		// MoMo_Start
+		if (iCol > 100) {
+			pDC->SelectStockObject(HOLLOW_BRUSH);
+			pDC->SetDCBrushColor(RGB(iR, iG, iB));
+			Pen = new CPen(PS_SOLID, 1, RGB(iR, iG, iB));
+		} else {
+			pDC->SelectStockObject(NULL_BRUSH);
+			Pen = new CPen(PS_SOLID, 2, RGB(iR, iG, iB));
+		}
+		// MoMo// Pen = new CPen(PS_SOLID, 2, RGB(iR, iG, iB));
+		// MoMo_End
 		OldPen = pDC->SelectObject(Pen);
 		// createpen
 	}
@@ -9918,11 +9954,20 @@ void DBase::Draw(C3dMatrix pM, CDC* pDC, int iDrawmode) {
 	// Do the highlighting if its a full redraw
 	// or a user forced redraw
 	if ((iDrawmode == 4) || (iDrawmode == 5)) {
+		// MoMo_Start
+		int iPen = 6;
+		// MoMo_End
 		SetPen(pDC, 6);
 		if (DspFlags & DSP_BLACK) {
 			SetPen(pDC, 6);
+			// MoMo_Start
+			iPen = 6;
+			// MoMo_End
 		} else {
 			SetPen(pDC, 7);
+			// MoMo_Start
+			iPen = 7;
+			// MoMo_End
 		}
 		int iHC = 0;
 		if (S_Count > 0) {
@@ -9938,11 +9983,44 @@ void DBase::Draw(C3dMatrix pM, CDC* pDC, int iDrawmode) {
 		}
 		// Highlight Points in the point Buffer
 		C3dVector vPt;
-		for (iDB_I = 0; iDB_I < DB_BuffCount; iDB_I++) {
-			vPt = DB_PtBuff[iDB_I];
-			vPt.SetToScr(&pModelMat, &pScrMat);
-			pDC->Ellipse(int(vPt.x + 8), int(vPt.y + 8), int(vPt.x - 8), int(vPt.y - 8));
+		// MoMo_Start
+		if (SeedVals.IsSeedMode && DB_BuffCount > 0) {
+			int iLastPen = 0;
+			for (iDB_I = 0; iDB_I < DB_BuffCount; iDB_I++) {
+				if (DB_PtBuff[iDB_I].tempSeedId > 0) {
+					if (iLastPen != 101) {
+						iLastPen = 101;
+						SetPen(pDC, 101);
+					}
+				} else {
+					if (iLastPen != 102) {
+						iLastPen = 102;
+						SetPen(pDC, 102);
+					}
+				}
+				vPt = DB_PtBuff[iDB_I];
+				vPt.SetToScr(&pModelMat, &pScrMat);
+				pDC->Ellipse(int(vPt.x - 3), int(vPt.y - 3), int(vPt.x + 3), int(vPt.y + 3));
+				pDC->Ellipse(int(vPt.x - 4), int(vPt.y - 4), int(vPt.x + 4), int(vPt.y + 4));
+				// pDC->MoveTo(int(vPt.x + 3), int(vPt.y + 3));
+				// pDC->LineTo(int(vPt.x - 3), int(vPt.y + 3));
+				// pDC->LineTo(int(vPt.x - 3), int(vPt.y - 3));
+				// pDC->LineTo(int(vPt.x + 3), int(vPt.y - 3));
+				// pDC->LineTo(int(vPt.x + 3), int(vPt.y + 3));
+			}
+			SetPen(pDC, iPen);
+		} else {
+			// MoMo_End
+			for (iDB_I = 0; iDB_I < DB_BuffCount; iDB_I++) {
+				vPt = DB_PtBuff[iDB_I];
+				vPt.SetToScr(&pModelMat, &pScrMat);
+				pDC->Ellipse(int(vPt.x + 8), int(vPt.y + 8), int(vPt.x - 8), int(vPt.y - 8));
+			}
+
+			// MoMo_Start
 		}
+		// MoMo_End
+
 		if (OTemp->iNo > 0) {
 			iHC = OTemp->iNo;
 			if ((iHLimit > -1) && (iHLimit < iHC))
@@ -10373,6 +10451,12 @@ int DBase::GetCurEType() {
 	return (iCurElemType);
 }
 
+// MoMo_Start
+double DBase::GetdTol() {
+	return (dTol);
+}
+// MoMo_End
+
 //***************************************************
 // Set buffer for incomming points
 //***************************************************
@@ -10665,6 +10749,48 @@ void DBase::UpTree() {
 	}
 }
 
+// MoMo_Start
+// G_Object* DBase::S_Single(CPoint InPT)
+//{
+//   double SDist = 1E36;
+//   G_Object* cSel = NULL;
+//
+//   int i = 0;
+//   G_Object pTarget;
+//   G_ObjectD pO;
+//   if (iDspLstCount > 0)
+//   {
+//      for (i = 0; i < iDspLstCount; i++)
+//      {
+//         if (Dsp_List[i]->isSelectable() == 1)
+//         {
+//            pO = Dsp_List[i]->SelDist(InPT, FILTER);
+//            if ((pO.Dist < SDist) && (pO.pObj != NULL))
+//            {
+//               if ((FILTER.isFilter(pO.pObj->iObjType) == 1) || (pO.pObj->iObjType == 999))
+//               {
+//                  SDist = pO.Dist;
+//                  cSel = pO.pObj;
+//               }
+//            }
+//         }
+//      }
+//   }
+//
+//   if ((cSel != NULL) && (SDist < 600))
+//   {
+//      int i;
+//      i = S_BuffAdd(cSel);
+//      if (i == 0)
+//      {
+//         ReGen();
+//      }
+//   }
+//   return (cSel);
+//}
+// MoMo_End
+
+// MoMo_Start
 G_Object* DBase::S_Single(CPoint InPT) {
 	double SDist = 1E36;
 	G_Object* cSel = NULL;
@@ -10672,29 +10798,41 @@ G_Object* DBase::S_Single(CPoint InPT) {
 	int i = 0;
 	G_Object pTarget;
 	G_ObjectD pO;
-	if (iDspLstCount > 0) {
+	if (SeedVals.SelectLock) {
+		outtextMultiLine("\r\nWARNING > You can not select any shape. <!>", 2);
+		outtextMultiLine(LastRequest, 2);
+		SetFocus();
+	} else if (iDspLstCount > 0) {
 		for (i = 0; i < iDspLstCount; i++) {
 			if (Dsp_List[i]->isSelectable() == 1) {
 				pO = Dsp_List[i]->SelDist(InPT, FILTER);
 				if ((pO.Dist < SDist) && (pO.pObj != NULL)) {
-					if ((FILTER.isFilter(pO.pObj->iObjType) == 1) || (pO.pObj->iObjType == 999)) {
-						SDist = pO.Dist;
-						cSel = pO.pObj;
+					if (SeedVals.SelectSurfaceCurves) {
+						if (SeedVals.SelectSurfaceCurves && pO.pObj->iObjType == 13 && pO.pObj->pParent->seedChanged && Dsp_List[i]->iType == 1) { //  && pO.pObj->nSeeds == 0 Dsp_List[i]->nSeeds
+							SDist = pO.Dist;
+							cSel = pO.pObj;
+						}
+					} else {
+						if (FILTER.isFilter(pO.pObj->iObjType) == 1 || (SeedVals.SelectSurface && pO.pObj->iObjType == 999)) {
+							SDist = pO.Dist;
+							cSel = pO.pObj;
+						}
 					}
 				}
 			}
 		}
-	}
-
-	if ((cSel != NULL) && (SDist < 600)) {
-		int i;
-		i = S_BuffAdd(cSel);
-		if (i == 0) {
-			ReGen();
+		if ((cSel != NULL) && (SDist < 600)) {
+			int i;
+			i = S_BuffAdd(cSel);
+			// MoMo: i==0 means remove from selection
+			if (i == 0) {
+				ReGen();
+			}
 		}
 	}
 	return (cSel);
 }
+// MoMo_End
 
 //****************************************************************
 // Pre:	pC valid poniter or curve, no of nodes to generate
@@ -11334,11 +11472,29 @@ void DBase::S_Des() {
 //***************************************************************
 
 void DBase::DB_AddPtBuff(C3dVector InPT) {
+	// MoMo_Start
+	if (DB_BuffCount < 0) {
+		DB_BuffCount = 0;
+	}
+	// MoMo_End
 	if (DB_BuffCount < 500) {
 		DB_PtBuff[DB_BuffCount] = InPT;
 		DB_BuffCount++;
 	}
 }
+
+// MoMo_Start
+void DBase::DB_AddPtBuffById(C3dVector InPT, int tempSeedId) {
+	if (DB_BuffCount < 0) {
+		DB_BuffCount = 0;
+	}
+	if (DB_BuffCount < 500) {
+		DB_PtBuff[DB_BuffCount] = InPT;
+		DB_PtBuff[DB_BuffCount].tempSeedId = tempSeedId;
+		DB_BuffCount++;
+	}
+}
+// MoMo_End
 
 void DBase::DB_ClearBuff() {
 	DB_BuffCount = 0;
@@ -11724,7 +11880,11 @@ void DBase::S_ImportOp2(FILE* pFile, CString inName, int iT) {
 					{
 						if ((iTC == 0) || (iTC == 2)) // statics real sort 1 & 2
 							AddOSTRRes(DataB, iCnt, sTitle, sSubTitle, inName);
-						else if ((iTC = 4) || (iTC = 5)) // Random  real sort 1 & 2
+						// MoMo_Start
+						// MoMo// else if ((iTC = 4) || (iTC = 5))	//Random  real sort 1 & 2
+						else if ((iTC == 4) || (iTC == 5)) // Random  real sort 1 & 2
+							// MoMo_End
+
 							AddOSTRResR(DataB, iCnt, sTitle, sSubTitle, inName, dFreq);
 					}
 					if (ACODE / 10 == 5) // Freq
@@ -12598,7 +12758,7 @@ BOOL DBase::CurvesToSurface508(int iS, IgesP* PDat, ObjList* Curves, ObjList* Pa
 				pS = GetIsoCurve(pSurf, pSC, iIso, TRUE);
 			else
 				pS = pSC->GetSurfaceCV4(pSurf); // this the planar version
-				                                // INCORRECT
+			// INCORRECT
 			if ((!bOrient(i)) && (pS != NULL)) {
 				pS->Reverse();
 				pS->bOrient = bOrient(i);
@@ -13069,7 +13229,6 @@ void DBase::InitOGL(CDC* pDC) {
 	HDC hdc = m_pDC->GetSafeHdc();
 	hrc = wglCreateContext(hdc);
 	wglMakeCurrent(hdc, hrc);
-
 	InitFont(hdc);
 	////Esp_Mod_Labels_4_27_2025_End
 
@@ -13213,10 +13372,18 @@ void DBase::CreateRGBPalette() {
 		}
 
 		/* fix up the palette to include the default GDI palette */
-		if ((pfd.cColorBits == 8) &
-		    (pfd.cRedBits == 3) & (pfd.cRedShift == 0) &
-		    (pfd.cGreenBits == 3) & (pfd.cGreenShift == 3) &
-		    (pfd.cBlueBits == 2) & (pfd.cBlueShift == 6)) {
+		// MoMo_Start
+		// if ((pfd.cColorBits == 8) &
+		//   (pfd.cRedBits == 3) & (pfd.cRedShift == 0) &
+		//   (pfd.cGreenBits == 3) & (pfd.cGreenShift == 3) &
+		//   (pfd.cBlueBits == 2) & (pfd.cBlueShift == 6)
+		//   )
+		if ((pfd.cColorBits == 8) &&
+		    (pfd.cRedBits == 3) && (pfd.cRedShift == 0) &&
+		    (pfd.cGreenBits == 3) && (pfd.cGreenShift == 3) &&
+		    (pfd.cBlueBits == 2) && (pfd.cBlueShift == 6))
+		// MoMo_End
+		{
 			for (i = 1; i <= 12; i++)
 				pPal->palPalEntry[defaultOverride[i]] = defaultPalEntry[i];
 		}
@@ -17885,14 +18052,10 @@ void DBase::SelCursbyLAY(int iLAY) {
 	ReDraw();
 }
 
-// Saeed_Material_SaveBugV1_05_20_2025_Start
-/*
-//Saeed_Material_SaveBugV1_05_20_2025_End
-void DBase::EditMat(int MID, BOOL bPID)
-//Saeed_Material_SaveBugV1_05_20_2025_Start
-*/
+// MoMo_Material_FormKeysBugV1_05_22_2025_Start
+// MoMo// void DBase::EditMat(int MID, BOOL bPID)
 void DBase::EditMat(int MID, BOOL bPID, bool& materialIDFound)
-// Saeed_Material_SaveBugV1_05_20_2025_End
+// MoMo_Material_FormKeysBugV1_05_22_2025_End
 {
 	Property* P = NULL;
 	Material* M = NULL;
@@ -17909,14 +18072,17 @@ void DBase::EditMat(int MID, BOOL bPID, bool& materialIDFound)
 	if (M != NULL) {
 		CEntEditDialog Dlg;
 		Dlg.pEnt = M;
+		// MoMo_Material_FormKeysBugV1_05_22_2025_Start
+		if (Dlg.pEnt->iType == 1) {
+			Dlg.FormCaption = "Isentropic Material";
+		} else {
+			Dlg.FormCaption = "Orthotropic Material";
+		}
+		// MoMo_Material_FormKeysBugV1_05_22_2025_End
 		Dlg.DoModal();
-		// Saeed_Material_SaveBugV1_05_20_2025_Start
-		/*
-		//Saeed_Material_SaveBugV1_05_20_2025_End
-		if (Dlg.bDel == TRUE)
-		   MatT->Delete(M);
-		//Saeed_Material_SaveBugV1_05_20_2025_Start
-		*/
+		// MoMo_Material_SaveBugV1_05_20_2025_Start
+		// MoMo// if (Dlg.bDel == TRUE)
+		// MoMo//	 MatT->Delete(M);
 		if (Dlg.bDel == TRUE || MatT->isTemp == true) {
 			MatT->Delete(M);
 			if (MatT->isTemp == false) {
@@ -17924,11 +18090,11 @@ void DBase::EditMat(int MID, BOOL bPID, bool& materialIDFound)
 			}
 		}
 		materialIDFound = true;
-		// Saeed_Material_SaveBugV1_05_20_2025_End
+		// MoMo_Material_SaveBugV1_05_20_2025_End
 	} else {
-		// Saeed_Material_SaveBugV1_05_20_2025_Start
+		// MoMo_Material_SaveBugV1_05_20_2025_Start
 		materialIDFound = false;
-		// Saeed_Material_SaveBugV1_05_20_2025_End
+		// MoMo_Material_SaveBugV1_05_20_2025_End
 	}
 }
 
@@ -19434,16 +19600,12 @@ void DBase::CreateMat1(CString sT, int iMID, double dE, double dV, double dDen, 
 	pMat->dA = dAlpha;
 	pMat->dk = dkt;
 	MatT->AddItem(pMat);
-	// Saeed_Material_SaveBugV1_05_20_2025_Start
-	/*
-	//Saeed_Material_SaveBugV1_05_20_2025_End
-	outtext1("New Material Created.");
-	//Saeed_Material_SaveBugV1_05_20_2025_Start
-	*/
+	// MoMo_Material_SaveBugV1_05_20_2025_Start
+	// MoMo// outtext1("New Material Created.");
 	if (MatT->isTemp == false) {
 		outtextSprintf("\r\nMaterial ID %i Created.", MatT->pEnts[MatT->iNo - 1]->iID, 0.0, true, 1);
 	}
-	// Saeed_Material_SaveBugV1_05_20_2025_End
+	// MoMo_Material_SaveBugV1_05_20_2025_End
 }
 
 void DBase::CreateMat8(CString sInTit,
@@ -19472,7 +19634,12 @@ void DBase::CreateMat8(CString sInTit,
 	pMat->dA1 = dInA1;
 	pMat->dA2 = dInA2;
 	MatT->AddItem(pMat);
-	outtext1("New Material Created.");
+	// MoMo_Material_FormKeysBugV1_05_22_2025_Start
+	// MoMo// outtext1("New Material Created.");
+	if (MatT->isTemp == false) {
+		outtextSprintf("\r\nMaterial ID %i Created.", MatT->pEnts[MatT->iNo - 1]->iID, 0.0, true, 1);
+	}
+	// MoMo_Material_FormKeysBugV1_05_22_2025_End
 }
 
 void DBase::CreatePrBox(CString sT, int iPID, int iMID, double dW, double dH, double dWT, double dHT) {
@@ -21780,8 +21947,10 @@ void DBase::CreateBSegs(ObjList* pP, cLinkedList* pS, double dS, NSurf* pSf) {
 		}
 		if (iInc == -1) {
 			dL = pSf->pExtLoop[i]->getLen();
+
 			if (dL > dTol) {
 				iInc = static_cast<int>(dL / dS);
+
 				if ((pSf->iNoExtCvs == 1) && (iInc < 4)) {
 					iInc = 4;
 				}
@@ -21827,7 +21996,9 @@ void DBase::CreateBSegs(ObjList* pP, cLinkedList* pS, double dS, NSurf* pSf) {
 			}
 			if (iInc == -1) {
 				dL = pSf->pIntLoop[k][i]->getLen();
+
 				iInc = static_cast<int>(dL / dS);
+
 				if ((pSf->iNoIntCvs[k] == 1) && (iInc < 4)) {
 					iInc = 4;
 				}
@@ -22136,3 +22307,871 @@ IDispatch* __stdcall DBase::API_GetOnSrnObject(LONG iNo) {
 	// TODO: Add your dispatch handler code here
 	return nullptr;
 }
+
+// MoMo_Start
+//*****************************************************************************
+//                2D SURFACE ADVANCING MESHING ALGORITHM
+//*****************************************************************************
+void DBase::MeshSurfAF_EXP04() {
+	double dSz = SeedVals.InputedMeshElementSize;
+	// MoMo// char S1[80];
+	outtext1("**** STARTING AFM GEN 2D ****");
+	PrintTime("START TIME: ");
+	BOOL bNinT;
+	int iNoEls;
+	bool bExitFail = FALSE;
+	C2dVector t1(0, 0);
+	C2dVector t2(1, 0);
+	C2dVector t3(0, 1);
+	C2dVector vTPt(1, 1);
+	bNinT = NodeInTri(t1, t2, t3, vTPt);
+	C3dVector v;
+	double dMinDst;
+	int iNodeLab = 1;
+	int iSegLab = 1;
+	int i;
+	int j;
+	// int iCO;
+	NSurf* pS;
+	double RR;
+	double RRF;
+
+	// MoMo_Start
+	double dsNew;
+	// MoMo_End
+	BOOL bIs;
+	eFaceList* pTesselation;
+	ObjList* Pts = new ObjList();
+	cLinkedList* Segs = new cLinkedList(); // The FRONT
+	ObjList* pCandidateSegs = new ObjList();
+	ObjList* pFrontNodes = new ObjList();
+	ObjList* pEls = new ObjList();
+	// AddObj(Segs); //If this is left in can save and reload model
+	BOOL bExit = TRUE;
+	c2dParPt* pPt;
+	c2dParPt* pPtN = new c2dParPt();
+	cSeg* pSeg;
+	C2dVector pTmp;
+	C2dVector pC;
+	C2dVector vD;
+	C3dVector p3d;
+	C3dVector dSSpc1;
+	C3dVector dSSpc2;
+	double dMinR;
+	int iID;
+	c2dParPt* pbFNd;
+	BOOL isNewNd;
+	int iDBCnt;
+	double dSclU;
+	double dSclV;
+	double dSclPU;
+	double dSclPV;
+	double dS;
+	dS = dSz;
+	Matrix<C3dVector> der;
+	C3dVector v1;
+	C3dVector v2;
+	for (int iObjList = 0; iObjList < iDspLstCount; iObjList++) {
+		if (Dsp_List[iObjList]->iObjType == 15 && Dsp_List[iObjList]->seedChanged) {
+			// for (iCO = 0; iCO < pSurfs->iNo; iCO++)
+			//	{
+			//		if (pSurfs->Objs[iCO]->iObjType == 15)
+			//		{
+
+			bExitFail = FALSE;
+			pS = (NSurf*) Dsp_List[iObjList]; // pSurfs->Objs[iObjList];
+			// if (pS->iLabel == 87)
+			//	pS->iLabel = 87;
+			if (pS->dSSize > 0)
+				dS = pS->dSSize;
+			CreateBSegs_EXP04(Pts, Segs, dS, pS);
+			Pts->GenIDS(iNodeLab);
+			Segs->GenIDS(iSegLab);
+			// Display the initial front
+			// GenPts(pS, Pts);
+			i = 0;
+			j = 0;
+			iDBCnt = DB_ObjectCount;
+			// Calulate element size in parametric ordinates
+			// U only at present
+			pSeg = (cSeg*) Segs->Head;
+			//**********Need to CHECK***********
+
+			//**********************************
+			do {
+				if (j == 30)
+					j = j;
+				pSeg = (cSeg*) Segs->Head;
+				// Calculate a node position away from seg
+				if (pSeg != NULL) {
+					// local scale factor
+					pS->deriveAt(pSeg->MpT.x, pSeg->MpT.y, 1, der);
+					v1 = der(1, 0);
+					dSclPU = v1.Mag();
+					v2 = der(0, 1);
+					dSclPV = v2.Mag();
+					C3dVector v3 = der(0, 0);
+					C3dVector v4 = der(1, 1);
+
+					// MoMo_Start
+					if (pSeg->nSeeds == 0) {
+						dsNew = dS;
+					} else {
+						dsNew = min(dS, min(pSeg->realdL, min(pSeg->realdLBefore, pSeg->realdLNext)));
+					}
+					dSclU = dsNew / dSclPU;
+					dSclV = dsNew / dSclPV;
+					// MoMo_End
+
+					der.DeleteAll();
+					// end local scale factor
+					vD.x = pSeg->pt[0]->PP.y - pSeg->pt[1]->PP.y;
+					vD.y = pSeg->pt[1]->PP.x - pSeg->pt[0]->PP.x;
+					vD.Normalize();
+
+					vD.x *= dSclU;
+					vD.y *= dSclV;
+
+					pTmp.x = pSeg->MpT.x + vD.x;
+					pTmp.y = pSeg->MpT.y + vD.y;
+					pTmp.Clamp(0, 1);
+					RR = CirCircle2d(pSeg, pTmp, pC, dSclPU, dSclPV);
+					C3dVector vCC = pS->GetPt(pC.x, pC.y);
+					// Need to check the new node is acceptable
+					// for now lets say it is
+					isNewNd = TRUE;
+					// Need to check this point pTmp is deluany and away from front and non intersecting.
+					// p3d = pS->GetPt(pTmp.x, pTmp.y);  //Just for visualisation
+					// pRealPt = AddPt(p3d, 111, TRUE);
+					// pRealPt->iLabel = iNodeLab; iNodeLab++;
+					pCandidateSegs->iNo = 0;
+					pFrontNodes->iNo = 0;
+					GetCandiatesSeg2d(pSeg, Segs, pC, 2 * RR, pCandidateSegs, dSclPU, dSclPV);
+					GetCandiatesNodes2d(pSeg, pCandidateSegs, pC, 2 * RR, pFrontNodes, dSclPU, dSclPV);
+					// Get Best node from boundary short list
+					dMinR = RR;
+					pbFNd = NULL;
+					pPtN->PP.x = pTmp.x;
+					pPtN->PP.y = pTmp.y;
+					dMinDst = ProximityChk2d(pCandidateSegs, pPtN, dSclPU, dSclPV);
+					if (dMinDst > 0.5 * RR) {
+						if (CheckInt(pCandidateSegs, pSeg, pPtN)) {
+							RR = 10000000000;
+							dMinR = RR;
+						}
+					} else {
+						RR = 10000000000;
+						dMinR = RR;
+					}
+					if (pFrontNodes->iNo == 0)
+						outtext1("WARNING: No Cnadidate Nodes.");
+					for (i = 0; i < pFrontNodes->iNo; i++) {
+						pPt = (c2dParPt*) pFrontNodes->Objs[i];
+						if (!CheckInt(pCandidateSegs, pSeg, pPt)) {
+							BOOL bNoGood = FALSE;
+							RRF = CirCircle2d(pSeg, pPt->PP, pC, dSclPU, dSclPV);
+							// Check no other nodes fall in circumcirle
+							bIs = isNodeInCircle2d(pFrontNodes, i, RRF, pC, dSclPU, dSclPV);
+							if (!bIs) {
+								// if seg[0],pPt and seg[1],pPt are in seg list
+								// it must form an element
+								if (RRF < dMinR) {
+									iID = pPt->iLabel;
+									pbFNd = pPt;
+									dMinR = RRF;
+								}
+								if ((isSegIn(pCandidateSegs, pSeg->pt[1], pPt)) &&
+								    (isSegIn(pCandidateSegs, pPt, pSeg->pt[0]))) {
+									iID = pPt->iLabel;
+									pbFNd = pPt;
+									dMinR = RRF;
+									break;
+								}
+							} else {
+								// outtext1("ERROR: Node in Circumcircle.");
+								// bExitFail = TRUE;
+							}
+						}
+					}
+					// if an acceptable node from the boundary is available use it
+					// else create the new a new point at pTmp
+					// SHOULD do a quality check to decide which is the best option
+					if (dMinR == 10000000000) {
+						bExitFail = TRUE; // Need to swap
+						outtext1("ERROR: Meshing Failed.");
+					} else
+						UpdateFront(pS, iNodeLab, iSegLab, isNewNd, pSeg, Pts, Segs, pbFNd, pTmp, pEls);
+				}
+				// if (j>1)
+
+				j++;
+				// if (j==155)
+				//    bExitFail = TRUE;
+			} while ((Segs->iCnt > 0) && (!bExitFail));
+		}
+		// Smoothing Cycle
+		// MoMo// outtext1("Performing 1 Smoothing Cycle");
+		// PrintTime("TIME: ");
+		if (!bExitFail)
+			Smooth(Pts, pEls);
+		// Generate Faces from pEls
+		iNoEls = pEls->iNo / 3;
+		pTesselation = GenTesselation(Pts, pEls);
+
+		Pts->DeleteAll();
+		Segs->DeleteAll();
+		pEls->Clear();
+		// MoMo// sprintf_s(S1, "Number off Tri Elements Generated: %i", iNoEls);
+		// MoMo// outtext1(S1);
+	}
+	InvalidateOGL();
+	ReGen();
+	delete (Pts);
+	delete (pEls);
+	Dsp_Rem(Segs);
+	RemTempGraphics(Segs);
+	RemObj(Segs);
+	PrintTime("END TIME: ");
+	outtext1("**** END AFM GEN 2D ****");
+
+	// Need to delete these too
+	// pFrontNodes
+	// pCandidateSegs
+	// pEls
+}
+// MoMo_End
+
+// MoMo_Start
+void DBase::CreateBSegs_EXP04(ObjList* pP, cLinkedList* pS, double dS, NSurf* pSf) {
+	int i, j, k;
+	double dL, dSInc, dSp;
+	int iInc = -1;
+	C3dVector vPt, vPt3d;
+	c2dParPt* pPt;
+	cSeg* pSeg;
+	NCurve* pEdge;
+	for (i = 0; i < pSf->iNoExtCvs; i++) {
+		iInc = -1;
+		if (pSf->pExtLoop[i]->pSC != NULL) {
+			pEdge = (NCurve*) pSf->pExtLoop[i]->pSC;
+			iInc = pEdge->iInc;
+		}
+		if (iInc == -1) {
+			dL = pSf->pExtLoop[i]->getLen();
+			// MoMo_Start
+			int nMeshSeedsOnThisCurve = pSf->pExtLoop[i]->nSeeds;
+			// MoMo_End
+			if (dL > dTol) {
+				// MoMo_Start
+				// MoMo// iInc = static_cast<int>(dL / dS);
+				iInc = static_cast<int>(std::ceil(dL / dS));
+				if (nMeshSeedsOnThisCurve != 0) {
+					iInc = max(iInc, nMeshSeedsOnThisCurve - 1);
+				}
+				// MoMo_End
+
+				if ((pSf->iNoExtCvs == 1) && (iInc < 4)) {
+					iInc = 4;
+				}
+				if (iInc < 1)
+					iInc = 1;
+			} else {
+				iInc = -1;
+			}
+		}
+		dSInc = (pSf->pExtLoop[i]->we - pSf->pExtLoop[i]->ws) / iInc;
+		dSp = pSf->pExtLoop[i]->ws;
+
+		for (j = 0; j < iInc; j++) {
+			vPt = pSf->pExtLoop[i]->GetParaPt(dSp);
+			pPt = new c2dParPt(vPt.x, vPt.y);
+			pPt->iColour = 4; // Identify as a boundary pt
+			pPt->pParent = pSf;
+			// MoMo_Start
+			pPt->nSeeds = pSf->pExtLoop[i]->nSeeds;
+			pPt->pXY = pSf->pExtLoop[i]->GetPt(dSp);
+			// MoMo_End
+			pP->Add(pPt);
+			dSp += dSInc;
+		}
+	}
+	// Generate External Segements
+	int nNewMeshSeeds = 0;
+	int iNext = 0, iPrevious = 0;
+	for (i = 0; i < pP->iNo - 1; i++) {
+		pSeg = new cSeg(pSf);
+		pS->Add(pSeg);
+		pSeg->pt[0] = (c2dParPt*) pP->Objs[i];
+		pSeg->pt[1] = (c2dParPt*) pP->Objs[i + 1];
+		pSeg->CalcMids();
+		pSeg->CalcRealdL();
+
+		// MoMo_Start
+		if (i == 0) {
+			iPrevious = pP->iNo - 1;
+			iNext = 1;
+		} else {
+			iPrevious = i - 1;
+			iNext = i + 1;
+		}
+		pSeg->nSeeds = max(max(pP->Objs[iPrevious]->nSeeds, pP->Objs[i]->nSeeds), pP->Objs[iNext]->nSeeds);
+		// MoMo_End
+	}
+	// Last closing segement
+	pSeg = new cSeg(pSf);
+	pS->Add(pSeg);
+	pSeg->pt[0] = (c2dParPt*) pP->Objs[pP->iNo - 1];
+	pSeg->pt[1] = (c2dParPt*) pP->Objs[0];
+	pSeg->CalcMids();
+	pSeg->CalcRealdL();
+	pS->CalcRealdLAllExter();
+
+	// MoMo_Start
+	pSeg->nSeeds = max(max(pP->Objs[pP->iNo - 2]->nSeeds, pP->Objs[pP->iNo - 1]->nSeeds), pP->Objs[0]->nSeeds);
+	// MoMo_End
+	int iSt;
+	for (k = 0; k < pSf->iNoIntLoops; k++) {
+		iSt = pP->iNo;
+		for (i = 0; i < pSf->iNoIntCvs[k]; i++) {
+			iInc = -1;
+			if (pSf->pIntLoop[k][i]->pSC != NULL) {
+				pEdge = (NCurve*) pSf->pIntLoop[k][i]->pSC;
+				iInc = pEdge->iInc;
+			}
+			if (iInc == -1) {
+				dL = pSf->pIntLoop[k][i]->getLen();
+				// MoMo_Start
+				int nMeshSeedsOnThisCurve = pSf->pIntLoop[k][i]->nSeeds;
+				// MoMo// iInc = static_cast<int>(dL / dS);
+				iInc = static_cast<int>(std::ceil(dL / dS));
+				if (nMeshSeedsOnThisCurve != 0) {
+					iInc = max(iInc, nMeshSeedsOnThisCurve - 1);
+				}
+				// MoMo_End
+				if ((pSf->iNoIntCvs[k] == 1) && (iInc < 4)) {
+					iInc = 4;
+				}
+				if (iInc < 1)
+					iInc = 1;
+			}
+
+			dSInc = (pSf->pIntLoop[k][i]->we - pSf->pIntLoop[k][i]->ws) / iInc;
+			dSp = pSf->pIntLoop[k][i]->ws;
+			for (j = 0; j < iInc; j++) {
+				vPt = pSf->pIntLoop[k][i]->GetParaPt(dSp);
+				pPt = new c2dParPt(vPt.x, vPt.y);
+				pPt->iColour = 4;
+				pPt->pParent = pSf;
+
+				// MoMo_Start
+				pPt->nSeeds = pSf->pIntLoop[k][i]->nSeeds;
+				pPt->pXY = pSf->pIntLoop[k][i]->GetPt(dSp);
+				// MoMo_End
+				pP->Add(pPt);
+				dSp += dSInc;
+			}
+		}
+		// Generate Internal Segments
+		for (i = iSt; i < pP->iNo - 1; i++) {
+			pSeg = new cSeg(pSf);
+			pS->Add(pSeg);
+			pSeg->pt[0] = (c2dParPt*) pP->Objs[i];
+			pSeg->pt[1] = (c2dParPt*) pP->Objs[i + 1];
+			pSeg->CalcMids();
+			pSeg->CalcRealdL();
+			if (pS->HeadInter == NULL) {
+				pS->HeadInter = pSeg;
+				pS->iCntInter = 1;
+			} else {
+				pS->iCntInter++;
+			}
+
+			// MoMo_Start
+			if (i == iSt) {
+				iPrevious = pP->iNo - 1;
+				iNext = iSt + 1;
+			} else {
+				iPrevious = i - 1;
+				iNext = i + 1;
+			}
+			pSeg->nSeeds = max(max(pP->Objs[iPrevious]->nSeeds, pP->Objs[i]->nSeeds), pP->Objs[iNext]->nSeeds);
+			// MoMo_End
+		}
+		// Last closing segement
+		pSeg = new cSeg(pSf);
+		pS->Add(pSeg);
+		pSeg->pt[0] = (c2dParPt*) pP->Objs[pP->iNo - 1];
+		pSeg->pt[1] = (c2dParPt*) pP->Objs[iSt];
+		pSeg->CalcMids();
+		// MoMo_Start
+		pSeg->CalcRealdL();
+		pS->CalcRealdLAllInter();
+		pSeg->nSeeds = max(max(pP->Objs[pP->iNo - 2]->nSeeds, pP->Objs[pP->iNo - 1]->nSeeds), pP->Objs[iSt]->nSeeds);
+		// MoMo_End
+	}
+}
+// MoMo_End
+
+// MoMo_Start
+void DBase::SaveOrResetTempSeeds_EXP04(CString sMode) {
+	int i, k, newTempSeedId = 0;
+	NSurf* checkSurface;
+	if (sMode == "Reset") {
+		for (int iList = 0; iList < iDspLstCount; iList++) {
+			if (Dsp_List[iList]->iObjType == 15) {
+				checkSurface = (NSurf*) Dsp_List[iList];
+				if (checkSurface != NULL) {
+					checkSurface->seedChanged = false;
+				}
+			}
+		}
+		NSurf* selSurface;
+		NCurve* selEdge;
+		for (int iSelList = 0; iSelList < S_Count; iSelList++) {
+			if (S_Buff[iSelList]->iObjType == 15) {
+				selSurface = (NSurf*) S_Buff[iSelList];
+				if (selSurface != NULL) {
+					selSurface->seedChanged = true;
+					for (i = 0; i < selSurface->iNoExtCvs; i++) {
+						if (selSurface->pExtLoop[i] != NULL) {
+							selEdge = (NCurve*) selSurface->pExtLoop[i];
+							if (selEdge != NULL) {
+								selEdge->seedChanged = false;
+								newTempSeedId++;
+								selEdge->tempSeedId = newTempSeedId;
+								selEdge->nTempSeeds = 0;
+								if (selEdge->nSeeds > 0) {
+									selEdge->seedChanged = true;
+									selEdge->nTempSeeds = -selEdge->nSeeds;
+									selEdge->tempSeedId = -newTempSeedId;
+								}
+							}
+						}
+					}
+					for (k = 0; k < selSurface->iNoIntLoops; k++) {
+						for (i = 0; i < selSurface->iNoIntCvs[k]; i++) {
+							if (selSurface->pIntLoop[k][i] != NULL) {
+								selEdge = (NCurve*) selSurface->pIntLoop[k][i];
+								if (selEdge != NULL) {
+									selEdge->seedChanged = false;
+									newTempSeedId++;
+									selEdge->tempSeedId = newTempSeedId;
+									selEdge->nTempSeeds = 0;
+									if (selEdge->nSeeds > 0) {
+										selEdge->seedChanged = true;
+										selEdge->nTempSeeds = -selEdge->nSeeds;
+										selEdge->tempSeedId = -newTempSeedId;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	} else if (sMode == "Save") {
+		NCurve* checkEdge;
+		for (int iList = 0; iList < iDspLstCount; iList++) {
+			if (Dsp_List[iList]->iObjType == 15) {
+				checkSurface = (NSurf*) Dsp_List[iList];
+				if (checkSurface != NULL) {
+					if (checkSurface->seedChanged) {
+						for (i = 0; i < checkSurface->iNoExtCvs; i++) {
+							if (checkSurface->pExtLoop[i] != NULL) {
+								checkEdge = (NCurve*) checkSurface->pExtLoop[i];
+								if (checkEdge != NULL) {
+									checkEdge->seedChanged = false;
+									checkEdge->tempSeedId = 0;
+									checkEdge->nSeeds = abs(checkEdge->nTempSeeds);
+								}
+							}
+						}
+						for (k = 0; k < checkSurface->iNoIntLoops; k++) {
+							for (i = 0; i < checkSurface->iNoIntCvs[k]; i++) {
+								if (checkSurface->pIntLoop[k][i] != NULL) {
+									checkEdge = (NCurve*) checkSurface->pIntLoop[k][i];
+									if (checkEdge != NULL) {
+										checkEdge->seedChanged = false;
+										checkEdge->tempSeedId = 0;
+										checkEdge->nSeeds = abs(checkEdge->nTempSeeds);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+// MoMo_End
+
+// MoMo_Start
+void DBase::AddOrRemoveTempSeeds_EXP04() {
+	NCurve* selEdge;
+	for (int iSelList = 0; iSelList < S_Count; iSelList++) {
+		if (S_Buff[iSelList]->iObjType == 13) {
+			selEdge = (NCurve*) S_Buff[iSelList];
+			if (selEdge != NULL) {
+				if (selEdge->nTempSeeds != SeedVals.InputedSeedNumbers) {
+					selEdge->seedChanged = true;
+					selEdge->nTempSeeds = SeedVals.InputedSeedNumbers;
+				}
+			}
+		}
+	}
+	NSurf* checkSurface;
+	NCurve* checkEdge;
+	for (int iObjList = 0; iObjList < iDspLstCount; iObjList++) {
+		if (Dsp_List[iObjList]->iObjType == 15) {
+			checkSurface = (NSurf*) Dsp_List[iObjList];
+			if (checkSurface->seedChanged) {
+				// checkSurface->seedChanged = false;
+				for (int iEdge = 0; iEdge < checkSurface->iNoExtCvs; iEdge++) {
+					if (checkSurface->pExtLoop[iEdge] != NULL) {
+						checkEdge = (NCurve*) checkSurface->pExtLoop[iEdge];
+						if (checkEdge != NULL) {
+							if (checkEdge->seedChanged) {
+								checkEdge->seedChanged = false;
+								ViewCurveSeeds("Remove", checkEdge->tempSeedId, checkEdge);
+								if (checkEdge->nTempSeeds > 0) {
+									ViewCurveSeeds("Add", abs(checkEdge->tempSeedId), checkEdge);
+								} else {
+									ViewCurveSeeds("Add", checkEdge->tempSeedId, checkEdge);
+								}
+							}
+						}
+					}
+				}
+				for (int iLoop = 0; iLoop < checkSurface->iNoIntLoops; iLoop++) {
+					for (int iEdge = 0; iEdge < checkSurface->iNoIntCvs[iLoop]; iEdge++) {
+						if (checkSurface->pIntLoop[iLoop][iEdge] != NULL) {
+							checkEdge = (NCurve*) checkSurface->pIntLoop[iLoop][iEdge];
+							if (checkEdge != NULL) {
+								if (checkEdge->seedChanged) {
+									checkEdge->seedChanged = false;
+									ViewCurveSeeds("Remove", checkEdge->tempSeedId, checkEdge);
+									if (checkEdge->nTempSeeds > 0) {
+										ViewCurveSeeds("Add", abs(checkEdge->tempSeedId), checkEdge);
+									} else {
+										ViewCurveSeeds("Add", checkEdge->tempSeedId, checkEdge);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	ReDraw();
+}
+// MoMo_End
+
+// MoMo_Start
+void DBase::ViewCurveSeeds(CString sMode, int tempSeedId, NCurve* curveIn) {
+	NCurveOnSurf* curveOnSurf = (NCurveOnSurf*) curveIn;
+	if (sMode == "Remove") {
+		int i = 0;
+		while (i < DB_BuffCount) {
+			if (abs(DB_PtBuff[i].tempSeedId) == abs(tempSeedId)) {
+				for (int j = i; j < DB_BuffCount - 1; j++) {
+					DB_PtBuff[j] = DB_PtBuff[j + 1];
+					DB_PtBuff[j].tempSeedId = DB_PtBuff[j + 1].tempSeedId;
+				}
+				DB_BuffCount--;
+			} else {
+				i++;
+			}
+		}
+	} else if (sMode == "Add") {
+		C3dVector ptXY, vPt, ptNo;
+		int n;
+		double L, L1, Lm, Ln, dw, dwSum;
+		std::vector<double> Lw;
+
+		if (curveIn->nTempSeeds == 0) {
+			return;
+		}
+		NCurveOnSurf* nCircle = (NCurveOnSurf*) curveIn; // NCurveOnSurf::isCircle
+		if (nCircle->isCircle()) {
+			n = abs(curveIn->nTempSeeds);
+		} else {
+			n = abs(curveIn->nTempSeeds) - 1;
+		}
+		L = curveOnSurf->we - curveOnSurf->ws;
+
+		// Lm = -1.0;
+		// L1 = -1.0;
+		// Ln = -1.0;
+		// if (cDBase->S_Count == SeedVals.InputedSeedNumbers) {
+		// }
+
+		// double realdL;
+		// double realdLBefore;
+		// double realdLNext;
+
+		Lm = L / n;
+		L1 = L / n;
+		Ln = L / n;
+
+		Lw = BalancedSegs_EXP04(n, L, L1, Ln, Lm);
+		double sumCheck = 0;
+		for (int j = 0; j < n; j++) {
+			sumCheck += Lw[j];
+		}
+
+		dw = curveOnSurf->ws;
+		dwSum = 0;
+		for (int j = 0; j <= n; j++) {
+			if (j == 0) {
+				dw = 0;
+			} else {
+				dw = Lw[j - 1];
+			}
+			dwSum = dwSum + dw;
+			vPt = curveOnSurf->GetParaPt(dwSum);
+			ptXY = curveOnSurf->GetPt(dwSum);
+			DB_AddPtBuffById(ptXY, tempSeedId);
+		}
+	}
+
+	// NCurve* C1;
+	// C3dVector ptXY, vPt, ptNo;
+	// NCurveOnSurf* curveOnSurf;
+	// G_Object* selObject;
+	// int n, nNewSeeds;
+	// double L, L1, Lm, Ln, dw, dwSum;
+	// std::vector<double> Lw;
+
+	// CalcTempSeeds_EXP04();
+
+	// ptNo = DB_PopBuff();
+	// nNewSeeds = 0;
+	// for (int i = 0; i < S_Count; i++)
+	//{
+	//	selObject = S_Buff[i];
+	//	if (selObject->iObjType == 13 && selObject->iType == 1 && selObject->nSeeds == 0)
+	//	{
+	//		curveOnSurf = (NCurveOnSurf*)selObject;
+	//		n = int(ptNo.x) - 1;
+	//		L = curveOnSurf->we - curveOnSurf->ws;
+
+	//		//Lm = -1.0;
+	//		//L1 = -1.0;
+	//		//Ln = -1.0;
+	//		//if (cDBase->S_Count == SeedVals.InputedSeedNumbers) {
+	//		//}
+
+	//		//double realdL;
+	//		//double realdLBefore;
+	//		//double realdLNext;
+
+	//		Lm = L / 3;
+	//		L1 = L / 3;
+	//		Ln = L / 3;
+
+	//		Lw = BalancedSegs_EXP04(n, L, L1, Ln, Lm);
+	//		double sumCheck = 0;
+	//		for (int j = 0; j < n; j++)
+	//		{
+	//			sumCheck += Lw[j];
+	//		}
+
+	//		dw = curveOnSurf->ws;
+	//		dwSum = 0;
+	//		for (int j = 0; j <= n; j++)
+	//		{
+	//			if (j == 0) {
+	//				dw = 0;
+	//			}
+	//			else {
+	//				dw = Lw[j - 1];
+	//			}
+	//			dwSum = dwSum + dw;
+	//			vPt = curveOnSurf->GetParaPt(dwSum);
+	//			ptXY = curveOnSurf->GetPt(dwSum);
+	//			DB_AddPtBuff(ptXY);
+	//		}
+	//		//selObject->nSeeds = int(ptNo.x);
+	//		//selObject->pParent->nSeeds = 1;
+	//		nNewSeeds = nNewSeeds + 1;
+	//	}
+	//}
+	// if (nNewSeeds > 0) {
+	//	outtextSprintf("Added Seed Points = %i", nNewSeeds, 0.0, true, 1);
+	//	ReDraw();
+	//}
+}
+// MoMo_End
+
+// MoMo_Start
+void DBase::CalcTempSeeds_EXP04() {
+	NSurf* checkSurface;
+	NCurve* checkEdge;
+	// int i, k;
+
+	for (int iObjList = 0; iObjList < S_Count; iObjList++) {
+		checkEdge = (NCurve*) S_Buff[iObjList];
+		checkSurface = (NSurf*) checkEdge->pParent;
+		checkSurface->nSeeds = 1; // in surface if nSeeds==0 means no changes happened
+		checkEdge->nSeeds = -SeedVals.InputedSeedNumbers;
+	}
+
+	// remove points if exist
+	//............
+
+	for (int iObjList = 0; iObjList < iDspLstCount; iObjList++) {
+		if (Dsp_List[iObjList]->iObjType == 15 && checkSurface->nSeeds == 1) {
+			checkSurface = (NSurf*) Dsp_List[iObjList];
+			for (int iCurve = 0; iCurve < checkSurface->iNoExtCvs; iCurve++) {
+				if (checkSurface->pExtLoop[iCurve] != NULL) {
+					checkEdge = (NCurve*) checkSurface->pExtLoop[iCurve];
+					if (checkEdge->nSeeds < 0) {
+						checkEdge->nSeeds = -checkEdge->nSeeds;
+						checkEdge->realdL = 0;
+						checkEdge->realdLBefore = 0;
+						checkEdge->realdLNext = 0;
+					}
+				}
+			}
+		}
+	}
+
+	// SeedVals.InputedMeshElementSize;
+	// SeedVals.InputedSeedNumbers;
+	/*
+	      for (i = 0; i < iDspLstCount; i++)
+	   {
+	      if (Dsp_List[i]->isSelectable() == 1)
+	      {
+	         pO = Dsp_List[i]->SelDist(InPT, FILTER);
+	         if ((pO.Dist < SDist) && (pO.pObj != NULL))
+	         {
+	            if (!SeedVals.SelectSurfaceCurves) {
+	               if (FILTER.isFilter(pO.pObj->iObjType) == 1 || (SeedVals.SelectSurface && pO.pObj->iObjType == 999))
+
+	*/
+	/*
+
+	   for (int iSelList = 0; iSelList < iDspLstCount; iSelList++)
+	   {
+	      if (Dsp_List[iSelList]->iObjType == 15)
+	      {
+	         checkSurface = (NSurf*)Dsp_List[iSelList];
+	         checkSurface->realdL = 0;
+	         checkSurface->realdLBefore = 0;
+	         checkSurface->realdLNext = 0;
+	         if (checkSurface->nSeeds != 0)
+	         {
+	            checkSurface->nSeeds = 0;
+	            for (i = 0; i < checkSurface->iNoExtCvs; i++)
+	            {
+	               if (checkSurface->pExtLoop[i] != NULL)
+	               {
+	                  checkEdge = (NCurve*)checkSurface->pExtLoop[i];
+	                  if (checkEdge->nSeeds != 0)
+	                  {
+	                     checkEdge->nSeeds = 0;
+	                     checkEdge->realdL = 0;
+	                     checkEdge->realdLBefore = 0;
+	                     checkEdge->realdLNext = 0;
+	                  }
+	               }
+	            }
+	            for (k = 0; k < checkSurface->iNoIntLoops; k++)
+	            {
+	               for (i = 0; i < checkSurface->iNoIntCvs[k]; i++)
+	               {
+	                  if (checkSurface->pIntLoop[k][i] != NULL)
+	                  {
+	                     checkEdge = (NCurve*)checkSurface->pIntLoop[k][i];
+	                     if (checkEdge->nSeeds != 0)
+	                     {
+	                        checkEdge->nSeeds = 0;
+	                        checkEdge->realdL = 0;
+	                        checkEdge->realdLBefore = 0;
+	                        checkEdge->realdLNext = 0;
+	                     }
+	                  }
+	               }
+	            }
+	         }
+	      }
+	   }
+
+	*/
+}
+// MoMo_End
+
+// MoMo_Start
+std::vector<double> DBase::BalancedSegs_EXP04(int n, double L, double L1, double Ln, double Lm) {
+	// CalcTempSeeds_EXP04(n, L, L1, Ln, Lm);
+
+	std::vector<double> Lw(n);
+	// Lw[0] = L1;
+	// Lw[1] = Lm;
+	// Lw[n - 1] = Ln;
+
+	for (int i = 1; i <= n; i++) {
+		Lw[i - 1] = Lm;
+	}
+
+	return Lw;
+
+	double sum_fixed = L1 + Ln;
+	int num_middle = n - 2;
+
+	if (n == 3) {
+		Lw[0] = L1;
+		Lw[1] = L - (L1 + Ln);
+		Lw[2] = Ln;
+	} else if (n % 2 == 1) {
+		// n is odd
+		int mid = n / 2;
+		Lw[mid] = Lm;
+		sum_fixed += Lm;
+
+		double a = (Ln - L1) / (n - 1); // original common difference
+		double sum = 0.0;
+		for (int i = 1; i < n - 1; ++i) {
+			if (i == mid)
+				continue;
+			Lw[i] = L1 + a * i;
+			sum += Lw[i];
+		}
+
+		double scale = (L - sum_fixed) / sum;
+		for (int i = 1; i < n - 1; ++i) {
+			if (i == mid)
+				continue;
+			Lw[i] *= scale;
+		}
+
+	} else {
+		// n is even
+		int mid1 = n / 2 - 1;
+		int mid2 = n / 2;
+		Lw[mid1] = Lw[mid2] = Lm / 2.0;
+		sum_fixed += Lm;
+
+		double a = (Ln - L1) / (n - 1);
+		double sum = 0.0;
+		for (int i = 1; i < n - 1; ++i) {
+			if (i == mid1 || i == mid2)
+				continue;
+			Lw[i] = L1 + a * i;
+			sum += Lw[i];
+		}
+
+		double scale = (L - sum_fixed) / sum;
+		for (int i = 1; i < n - 1; ++i) {
+			if (i == mid1 || i == mid2)
+				continue;
+			Lw[i] *= scale;
+		}
+	}
+
+	return Lw;
+}
+// MoMo_End

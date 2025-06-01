@@ -3,6 +3,7 @@
 #include "math.h"
 #include "Parser.h"
 #include "GLOBAL_VARS.h"
+
 // constructor sets where to out text
 const double Pi = 3.1415926535;
 #define D2R 0.01745329251994
@@ -34,7 +35,7 @@ void zMnu::DoNext(CString* CInMsg, CPoint Pt) {
 			delete pNext;
 			pNext = NULL;
 			iCKill = 0;
-			iStat = iResumePos; // poistion to resume
+			iStat = iResumePos; // poistion to resume //MoMo: (Done or Yes)
 			*CInMsg = "NULL";
 			// cDBase->DB_ActiveBuffSet(1);
 		}
@@ -42,11 +43,22 @@ void zMnu::DoNext(CString* CInMsg, CPoint Pt) {
 			delete pNext;
 			pNext = NULL;
 			iCKill = 0;
-			iStat = iCancelPos; // poistion to resume
+			iStat = iCancelPos; // poistion to Cancel
 			*CInMsg = "NULL";
 			cDBase->S_Res();
 			// cDBase->DB_ActiveBuffSet(1);
 		}
+		/// MoMo_Start
+		if (iCKill == 3) {
+			delete pNext;
+			pNext = NULL;
+			iCKill = 0;
+			iStat = iNoPos; // poistion to No
+			*CInMsg = "NULL";
+			cDBase->S_Res();
+			// cDBase->DB_ActiveBuffSet(1);
+		}
+		// MoMo_End
 	}
 }
 
@@ -1881,7 +1893,29 @@ int zMnu::DoMenu(CString CInMsg, CPoint Pt) {
 					pNext = new zMMESHAF_Mnu();
 					pNext->Init(cDBase, -1);
 					this->DoMenu(CInMsg, Pt);
-				} else if (CInMsg == "EXTRACT") {
+				}
+				// MoMo_Start
+				else if (CInMsg.CompareNoCase("EXP04") == 0) {
+					iResumePos = 0;
+					iCancelPos = 100;
+					cDBase->DB_ActiveBuffSet(2);
+					cDBase->DB_ClearBuff();
+					cDBase->S_Des();
+					pNext = new zEXP04_Mnu();
+					pNext->Init(cDBase, -1);
+					this->DoMenu(CInMsg, Pt);
+				} else if (CInMsg.CompareNoCase("EXP05") == 0) {
+					iResumePos = 0;
+					iCancelPos = 100;
+					cDBase->DB_ActiveBuffSet(2);
+					cDBase->DB_ClearBuff();
+					cDBase->S_Des();
+					pNext = new zEXP05_Mnu();
+					pNext->Init(cDBase, -1);
+					this->DoMenu(CInMsg, Pt);
+				}
+				// MoMo_End
+				else if (CInMsg == "EXTRACT") {
 					iResumePos = 0;
 					iCancelPos = 100;
 					cDBase->DB_ActiveBuffSet(2);
@@ -2534,6 +2568,285 @@ int zMnu::ExtractPt(CString mCInMsg, C3dVector* ReturnPt) {
 	return iIsValid;
 }
 
+// MoMo_Start
+int zEXP04_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
+	DoNext(&CInMsg, Pt);
+	if (pNext == NULL) {
+		C3dVector ptNo;
+		CPoint Pt;
+		if (CInMsg.CompareNoCase("C") == 0 || CInMsg.CompareNoCase("CANCEL") == 0) // Common Options
+		{
+			RetVal = 2;
+			cDBase->FILTER.SetAll();
+			iStat = 100;
+		}
+		// ======================================================================
+		if (iStat == 0) { // initializing
+			SeedVals.IsSeedMode = true;
+			cDBase->DB_ClearBuff();
+			iStat = 1;
+		}
+		// ======================================================================
+		if (iStat == 1) { // select surface(s)
+			SeedVals.SelectLock = false;
+			SeedVals.SelectSurface = true;
+			SeedVals.SelectSurfaceCurves = false;
+			outtextMultiLine("\r\nEXP04", 1);
+			outtext1("1 >>");
+			nCancel = 1;
+			outtext1("Select Surface(s) containing curves.");
+			outtext1("Pick Surface(s) >> Right Click >> Done");
+			LastRequest = "// Select Surface(s) containing curves >> Right Click >> Done >>";
+			outtextMultiLine(LastRequest, 2);
+			cDBase->FILTER.Clear();
+			cDBase->FILTER.SetFilter(15);
+			cDBase->DB_ClearBuff();
+			cDBase->S_Des();
+			iResumePos = 2;
+			iCancelPos = 100;
+			pNext = new zSEL_EXP04_Mnu();
+			pNext->Init(cDBase, 3);
+			DoNext(&CInMsg, Pt);
+		}
+		// ======================================================================
+		if (iStat == 2 || iStat == 3) { // select curve(s) (first || after first)
+			SeedVals.SelectLock = false;
+			SeedVals.SelectSurface = false;
+			SeedVals.SelectSurfaceCurves = true;
+			cDBase->FILTER.Clear();
+			cDBase->FILTER.SetFilter(13);
+			if (iStat == 2) { // first entrance
+				cDBase->SaveOrResetTempSeeds_EXP04("Reset");
+				SeedVals.InputedSeedNumbers = 0;
+				cDBase->AddOrRemoveTempSeeds_EXP04();
+				outtext1("2 >>");
+				nCancel = 2;
+				outtext1("Select Surface Curve(s) to set Number Of Seeds.");
+				outtext1("Pick Surface Curve(s) >> Right Click >> Done");
+				outtext1("Also after selection, you can: A-press mouse middle button or B-press Enter or C-press D/d and Enter");
+				iResumePos = 4;
+			} else {
+				iResumePos = 5;
+				iNoPos = 9;
+			}
+			cDBase->S_Des(); // deselect all
+			LastRequest = "// Pick Surface Curve(s) >> Right Click >> Done >>";
+			outtextMultiLine(LastRequest, 2);
+			iCancelPos = 100;
+			pNext = new zSEL_EXP04_Mnu();
+			if (iStat == 2) {
+				pNext->Init(cDBase, 1);
+			} else {
+				pNext->Init(cDBase, 2);
+			}
+			DoNext(&CInMsg, Pt);
+		}
+		// ======================================================================
+		if (iStat == 4 || iStat == 5) { // input seed number  (first || after first)
+			SeedVals.SelectLock = true;
+			if (cDBase->S_Count > 0) {
+				if (iStat == 4) { // first entrance
+					outtext1("3 >>");
+					nCancel = 3;
+					outtext1("Input Seed Numbers (minimum 4 or 0 to Clear) >> Press Enter");
+					outtext1("Seed Numbers applies to each selected curve.");
+					outtext1("Minimum value of Seed Numbers is 4");
+					outtext1("Also you can input 0 to Clear mesh seeds on selected curve(s).");
+				}
+				SetFocus();
+				if (iStat == 4) {
+					iResumePos = 6;
+				} else {
+					iResumePos = 7;
+				}
+				iCancelPos = 100;
+				SeedVals.SelectLock = true;
+				pNext = new zKEY_EXP04_Mnu();
+				pNext->Init(cDBase, 1);
+				DoNext(&CInMsg, Pt);
+			} else {
+				iStat = 3;
+			}
+		}
+		// ======================================================================
+		if (iStat == 6 || iStat == 7) { // apply mesh seeds  (first || after first)
+			cDBase->AddOrRemoveTempSeeds_EXP04();
+			if (iStat == 6) {
+				iStat = 8;
+			} else {
+				iStat = 9;
+			}
+		}
+		// ======================================================================
+		if (iStat == 8 || iStat == 9) { //  ask if continue select curve(s) (first || after first)
+			SeedVals.SelectLock = true;
+			if (iStat == 8) { // first entrance
+				outtext1("4 >>");
+				nCancel = 4;
+				outtext1("Enter Y/Yes to select the next curve(s), or N/No to finish.");
+				outtext1("Also you can select Yes or No by Right Click.");
+			}
+			iResumePos = 3;
+			iNoPos = 10;
+			iCancelPos = 100;
+			pNext = new zKEY_EXP04_Mnu();
+			pNext->Init(cDBase, 2);
+			DoNext(&CInMsg, Pt);
+		}
+		// ======================================================================
+		if (iStat == 10) { // do mesh
+			cDBase->SaveOrResetTempSeeds_EXP04("Save");
+			outtext1("5 >>");
+			outtextMultiLine("EXP04 Applied successfully.\r\n", 1);
+			outtext2("EXP04 Applied successfully.");
+		}
+		// ======================================================================
+		if (iStat == 100) // cancel
+		{
+			cDBase->SaveOrResetTempSeeds_EXP04("Cancel");
+			outtextSprintf("%i >>", nCancel + 1, 0.0, true, 1);
+			outtextMultiLine("EXP04 Canceled successfully.\r\n", 1);
+			outtext2("EXP04 Canceled successfully.");
+		}
+		// ======================================================================
+		if (iStat == 10 || iStat == 100) // do mesh OR cancel
+		{
+			SeedVals.SelectLock = false;
+			SeedVals.IsSeedMode = false;
+			SeedVals.SelectSurface = true;
+			SeedVals.SelectSurfaceCurves = false;
+			cDBase->OTemp->Clear();
+			cDBase->FILTER.SetAll();
+			cDBase->DB_ClearBuff();
+			cDBase->S_Des();
+			outtext2("");
+			RetVal = 1;
+		}
+	}
+	return RetVal;
+}
+// MoMo_End
+
+// MoMo_Start
+int zEXP05_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
+	DoNext(&CInMsg, Pt);
+	if (pNext == NULL) {
+		C3dVector ptNo;
+		CPoint Pt;
+		if (CInMsg.CompareNoCase("C") == 0 || CInMsg.CompareNoCase("CANCEL") == 0) // Common Options
+		{
+			RetVal = 2;
+			cDBase->FILTER.SetAll();
+			iStat = 100;
+		}
+		// ======================================================================
+		if (iStat == 0) { // initializing
+			SeedVals.IsSeedMode = true;
+			iStat = 1;
+		}
+		// ======================================================================
+		if (iStat == 1) { // select surface(s)
+			SeedVals.SelectLock = false;
+			SeedVals.SelectSurface = true;
+			SeedVals.SelectSurfaceCurves = false;
+			outtextMultiLine("\r\nEXP05", 1);
+			outtext1("1 >>");
+			nCancel = 1;
+			outtext1("Select Surface(s) containing mesh seeds.");
+			outtext1("Pick Surface(s) >> Right Click >> Done");
+			LastRequest = "// Select Surface(s) containing mesh seeds >> Right Click >> Done >>";
+			outtextMultiLine(LastRequest, 2);
+			cDBase->FILTER.Clear();
+			cDBase->FILTER.SetFilter(15);
+			cDBase->DB_ClearBuff();
+			cDBase->S_Des(); // deselect all
+			iResumePos = 2;
+			iCancelPos = 100;
+			pNext = new zSEL_EXP04_Mnu();
+			pNext->Init(cDBase, 3);
+			DoNext(&CInMsg, Pt);
+		}
+		// ======================================================================
+		// (preview setted seeds)
+		if (iStat == 2 || iStat == 3) { // input element size of mesh (first || after first)
+			SeedVals.SelectLock = true;
+			if (iStat == 2) { // first entrance
+				outtext1("2 >>");
+				nCancel = 2;
+				outtext1("Input Element Size Of Mesh >> Press Enter");
+				double minElementSize = cDBase->GetdTol();
+				outtextSprintf("Minimum Element Size value = %.6g", 0, minElementSize, false, 1);
+				cDBase->SaveOrResetTempSeeds_EXP04("Reset");
+				SeedVals.InputedSeedNumbers = 0;
+				cDBase->AddOrRemoveTempSeeds_EXP04();
+				cDBase->S_Des(); // deselect all
+			}
+			SetFocus();
+			if (iStat == 2) {
+				iResumePos = 4;
+			} else {
+				iResumePos = 5;
+			}
+			iCancelPos = 100;
+			SeedVals.SelectLock = true;
+			pNext = new zKEY_EXP04_Mnu();
+			pNext->Init(cDBase, 3);
+			DoNext(&CInMsg, Pt);
+		}
+		// ======================================================================
+		// (show new points with setted seeds)
+		if (iStat == 4 || iStat == 5) { //  ask if continue select curve(s) (first || after first)
+			SeedVals.SelectLock = true;
+			if (iStat == 4) { // first entrance
+				outtext1("3 >>");
+				nCancel = 3;
+				outtext1("Enter Y/Yes to finish, or N/No to input New Element Size Of Mesh.");
+				outtext1("Also you can select Yes or No by Right Click.");
+			}
+			iResumePos = 6;
+			iNoPos = 3;
+			iCancelPos = 100;
+			pNext = new zKEY_EXP04_Mnu();
+			pNext->Init(cDBase, 4);
+			DoNext(&CInMsg, Pt);
+		}
+		// ======================================================================
+		// (show meshing)
+		if (iStat == 6) { // do mesh
+			cDBase->MeshSurfAF_EXP04();
+			cDBase->OTemp->Clear();
+			cDBase->SaveOrResetTempSeeds_EXP04("Cancel");
+			outtext1("4 >>");
+			outtextMultiLine("EXP05 Applied successfully.\r\n", 1);
+			outtext2("EXP05 Applied successfully.");
+		}
+		// ======================================================================
+		if (iStat == 100) // cancel
+		{
+			cDBase->SaveOrResetTempSeeds_EXP04("Cancel");
+			outtextSprintf("%i >>", nCancel + 1, 0.0, true, 1);
+			outtextMultiLine("EXP05 Canceled successfully.\r\n", 1);
+			outtext2("EXP05 Canceled successfully.");
+		}
+		// ======================================================================
+		if (iStat == 6 || iStat == 100) // do mesh OR cancel
+		{
+			SeedVals.SelectLock = false;
+			SeedVals.IsSeedMode = false;
+			SeedVals.SelectSurface = true;
+			SeedVals.SelectSurfaceCurves = false;
+			cDBase->OTemp->Clear();
+			cDBase->FILTER.SetAll();
+			cDBase->DB_ClearBuff();
+			cDBase->S_Des();
+			outtext2("");
+			RetVal = 1;
+		}
+	}
+	return RetVal;
+}
+// MoMo_End
+
 int zPT_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 	DoNext(&CInMsg, Pt);
 	if (pNext == NULL) {
@@ -2625,8 +2938,11 @@ int zSEL_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 	CString CInMsg2 = CInMsg;
 	DoNext(&CInMsg, Pt);
 	if (pNext == NULL) {
-		if (CInMsg2 == "C") // Common Options
+		// MoMo_Start
+		// MoMo// if (CInMsg2 == "C") //Common Options
+		if (CInMsg.CompareNoCase("C") == 0) // Common Options
 		{
+			// MoMo_End
 			RetVal = 2;
 			goto MenuEnd;
 		}
@@ -2635,7 +2951,11 @@ int zSEL_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 			goto MenuEnd;
 		}
 		if (iStat == 1) {
-			if ((CInMsg2 == "D") || (CInMsg2 == "")) {
+			// MoMo_Start
+			// MoMo// if ((CInMsg2=="D") || (CInMsg2==""))
+			if (CInMsg.CompareNoCase("D") == 0 || CInMsg2 == "")
+			// MoMo_End
+			{
 				iStat = 2;
 			} else if (CInMsg == "LAB") {
 				iResumePos = 2;
@@ -2665,6 +2985,74 @@ int zSEL_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 MenuEnd:
 	return RetVal;
 }
+
+// MoMo_Start
+int zSEL_EXP04_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
+	CString CInMsg2 = CInMsg;
+	DoNext(&CInMsg, Pt);
+	if (pNext == NULL) {
+		if (CInMsg.CompareNoCase("C") == 0 || CInMsg.CompareNoCase("CANCEL") == 0) { // Common Options
+			RetVal = 2; // cancel
+			goto MenuEnd;
+		}
+		if (iStat == 0) {
+			iStat = 1;
+			goto MenuEnd;
+		}
+		if (iStat == 1) {
+			if (CInMsg == "") {
+				outtextMSG2("[Done]");
+			} else if (CInMsg.CompareNoCase("D") == 0 || CInMsg.CompareNoCase("DONE") == 0 || CInMsg == "[Done]") {
+				// C3dVector GetPt;
+				if (iT == 1) { // ========================= first selecting of curve(s)
+					if (cDBase->S_Count > 0) {
+						iStat = 2;
+						RetVal = 1;
+						// GetPt.Set(0.0, 1.0, 0.0); // ------ done or yes
+					} else {
+						outtextMultiLine("\r\nERROR >>> At least one Curve must be selected. [!!!]", 2);
+						outtextMultiLine(LastRequest, 2);
+						// GetPt.Set(0.0, 1.0, -1.0); // ------no or error or warning
+					}
+				} else if (iT == 2) { // ========================= continue selecting of curve(s)
+					// if (cDBase->S_Count > cDBase->S_Count_Initial) {
+					if (cDBase->S_Count) {
+						iStat = 2;
+						RetVal = 1;
+						// GetPt.Set(0.0, 2.0, 0.0); // ------ done or yes
+					} else {
+						// outtextMultiLine("\r\nERROR >>> At least one new Curve must be added to the selection. [!!!]", 2);
+						outtextMultiLine("\r\nERROR >>> At least one Curve must be selected. [!!!]", 2);
+						// outtextMultiLine(LastRequest, 2);
+						iStat = 2;
+						RetVal = 3; // ------ no or error or warning
+						// GetPt.Set(0.0, 2.0, -1.0);
+					}
+				} else if (iT == 3) { // ========================= select surface(s)
+					if (cDBase->S_Count > 0) {
+						iStat = 2;
+						RetVal = 1;
+						// GetPt.Set(0.0, 3.0, 0.0); // ------ done or yes
+					} else {
+						outtextMultiLine("\r\nERROR >>> At least one Surface must be selected. [!!!]", 2);
+						outtextMultiLine(LastRequest, 2);
+						// iStat = 2;
+						// RetVal = 3;
+						// GetPt.Set(0.0, 2.0, -1.0); // ------ no or error or warning
+					}
+				}
+				// cDBase->DB_AddPtBuff(GetPt);
+			} else if (CInMsg != "MouseInp") {
+				outtextMultiLine("\r\nERROR >>> Wrong input. Right Click >> Done Or Press Enter. [!!!]", 2);
+				outtextMultiLine(LastRequest, 2);
+				SetFocus(); // ========================= wrong input
+			}
+		}
+	}
+MenuEnd:
+	return RetVal;
+}
+// MoMo_End
 
 int zNDCR_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 	CString CInMsg2;
@@ -4479,7 +4867,10 @@ MenuEnd:
 int zKEY_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 	DoNext(&CInMsg, Pt);
 	if (pNext == NULL) {
-		if (CInMsg == "C") // Common Options
+		// MoMo_Start
+		// MoMo// if (CInMsg2 == "C") //Common Options
+		if (CInMsg.CompareNoCase("C") == 0) // Common Options
+		// MoMo_End
 		{
 			RetVal = 2;
 			goto MenuEnd;
@@ -4505,6 +4896,107 @@ int zKEY_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 MenuEnd:
 	return RetVal;
 }
+
+// MoMo_Start
+int zKEY_EXP04_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
+	DoNext(&CInMsg, Pt);
+	if (pNext == NULL) {
+		if (CInMsg.CompareNoCase("C") == 0 || CInMsg.CompareNoCase("CANCEL") == 0) { // Common Options
+			RetVal = 2; // cancel
+			goto MenuEnd;
+		}
+		if ((iStat == 0)) {
+			if (iT == 1) {
+				LastRequest = "// Input Seed Numbers (minimum 4 or 0 to Clear) >> Press Enter:";
+				outtext2(LastRequest);
+				SetFocus();
+			} else if (iT == 2) {
+				LastRequest = "// Continue selecting Curve(s)? Right Click >> Yes or No >>";
+				outtext2(LastRequest);
+				SetFocus();
+			} else if (iT == 3) {
+				LastRequest = "// Input Element Size Of Mesh >> Press Enter:";
+				outtext2(LastRequest);
+				SetFocus();
+			} else if (iT == 4) {
+				LastRequest = "// Finish Process and Make Mesh by Seeds? Right Click >> Yes or No >>";
+				outtext2(LastRequest);
+				SetFocus();
+			}
+			iStat = 1;
+			goto MenuEnd;
+		}
+		if ((CInMsg == "MouseInp") && (iStat == 1))
+			goto MenuEnd;
+		if (iStat == 1) {
+			if (CInMsg == "") {
+				if (iT == 1) {
+					outtextMSG2("[0]");
+				} else if (iT == 2 || iT == 4) {
+					outtextMSG2("[Yes]");
+				} else if (iT == 3) {
+					outtextMSG2("[0]");
+				}
+			} else {
+				C3dVector GetPt;
+				if (iT == 1) { // ========================= an integer number for element size >= 4 or ... == 0
+					int iPt = ExtractPt(CInMsg, &GetPt);
+					// GetPt.Set(GetPt.x, 1.0, 0.0);
+					if (GetPt.x >= 4 || GetPt.x == 0) {
+						SeedVals.InputedSeedNumbers = (int) GetPt.x;
+						iStat = 2;
+						RetVal = 1; // ------ done or yes
+					} else {
+						outtextMultiLine("\r\nERROR >>> Minimum value = 4 or Input 0 to Clear. [!!!]", 2);
+						outtext2("Please input again.");
+						outtextMultiLine(LastRequest, 2);
+						SetFocus(); // ------ error
+					}
+				} else if (iT == 2 || iT == 4) { // ========================= read y/n/yes/no char
+					if (CInMsg.CompareNoCase("Y") == 0 || CInMsg.CompareNoCase("YES") == 0 || CInMsg == "[Yes]" ||
+					    CInMsg == "" || CInMsg.CompareNoCase("D") == 0 || CInMsg.CompareNoCase("DONE") == 0 || CInMsg == "[Done]") {
+						// GetPt.Set(0.0, 2.0, 1.0);
+						iStat = 2;
+						RetVal = 1; // ------ done or yes
+					} else if (CInMsg.CompareNoCase("N") == 0 || CInMsg.CompareNoCase("NO") == 0) {
+						// GetPt.Set(0.0, 2.0, 2.0);
+						iStat = 2;
+						RetVal = 3; // ------ no
+					} else {
+						// GetPt.Set(0.0, 2.0, -1.0);
+						outtextMultiLine("\r\nERROR >>> You should input Yes or No. [!!!]", 2);
+						outtext2("Please input again.");
+						if (iT == 2) {
+							outtext2("Continue selecting Curve(s)?");
+						} else if (iT == 4) {
+							outtext2("Stop Editing Element Size Of Mesh?");
+						}
+						outtextMultiLine(LastRequest, 2);
+						SetFocus(); // ------ error
+					}
+				} else if (iT == 3) { // ========================= a float number > 0
+					int iPt = ExtractPt(CInMsg, &GetPt);
+					double minElementSize = cDBase->GetdTol();
+					// GetPt.Set(GetPt.x, 3.0, 0.0);
+					if (GetPt.x >= minElementSize) {
+						SeedVals.InputedMeshElementSize = GetPt.x;
+						iStat = 2;
+						RetVal = 1; // ------ done or yes
+					} else {
+						outtextSprintf("\r\nERROR >>> Element Size value >= %.6g [!!!]", 0, minElementSize, false, 2);
+						outtext2("Please input again.");
+						outtextMultiLine(LastRequest, 2);
+						SetFocus(); // ------ error
+					}
+				}
+				// cDBase->DB_AddPtBuff(GetPt);
+			}
+		}
+	}
+MenuEnd:
+	return RetVal;
+}
+// MoMo_End
 
 int zWPALIGN_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 	DoNext(&CInMsg, Pt);
@@ -10547,6 +11039,7 @@ int zPRBUSH_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 MenuEnd:
 	return RetVal;
 }
+
 int zPRMASS_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 	CString CInMsg2 = CInMsg;
 	DoNext(&CInMsg, Pt);
@@ -14021,6 +14514,7 @@ int zHIDE_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 MenuEnd:
 	return RetVal;
 }
+
 int zDSPSEL_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 	cDBase->Dsp_All();
 	cDBase->Dsp_Selected();
@@ -14034,6 +14528,7 @@ int zDES_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 	RetVal = 1;
 	return RetVal;
 }
+
 int zGPBYMID_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 	outtext1("Creating Groups by Material ID.");
 	cDBase->AddToGroupbyMID(-1);
@@ -14095,55 +14590,42 @@ int zMATEDIT_Mnu::DoMenu(CString CInMsg, CPoint Pt) {
 		if (iStat == 0) {
 			cDBase->FILTER.Clear();
 			cDBase->FILTER.SetFilter(3);
-			// Saeed_Material_SaveBugV1_05_20_2025_Start
-			/*
-			//Saeed_Material_SaveBugV1_05_20_2025_End
-			outtext2("// ENTER MID OR PICK ELEMENT");
-			//Saeed_Material_SaveBugV1_05_20_2025_Start
-			*/
+			// MoMo_Material_SaveBugV1_05_20_2025_Start
+			// MoMo// outtext2("// ENTER MID OR PICK ELEMENT");
 			outtext2("// ENTER Material ID OR PICK ELEMENT");
-			// Saeed_Material_SaveBugV1_05_20_2025_End
+			// MoMo_Material_SaveBugV1_05_20_2025_End
 			CInMsg = "NULL";
 			iStat = 1;
 			SetFocus();
 		}
 		if (iStat == 1) {
-			// Saeed_Material_SaveBugV1_05_20_2025_Start
+			// MoMo_Material_SaveBugV1_05_20_2025_Start
 			bool materialIDFound;
-			// Saeed_Material_SaveBugV1_05_20_2025_End
+			// MoMo_Material_SaveBugV1_05_20_2025_End
 			if ((CInMsg != "MouseInp") && (CInMsg != "D") && (CInMsg != "NULL")) {
 				C3dVector GetPt;
 				int iPt = ExtractPt(CInMsg, &GetPt);
-				// Saeed_Material_SaveBugV1_05_20_2025_Start
-				/*
-				//Saeed_Material_SaveBugV1_05_20_2025_End
-				cDBase->EditMat((int)GetPt.x, FALSE);
-				//Saeed_Material_SaveBugV1_05_20_2025_Start
-				*/
+				// MoMo_Material_SaveBugV1_05_20_2025_Start
+				// MoMo// cDBase->EditMat((int)GetPt.x, FALSE);
 				cDBase->EditMat((int) GetPt.x, FALSE, materialIDFound);
 				if (!materialIDFound) {
 					outtextSprintf("\r\nERROR >>> Material ID %i Not found. [!!!]", (int) GetPt.x, 0.0, true, 2);
 				}
-				// Saeed_Material_SaveBugV1_05_20_2025_End
+				// MoMo_Material_SaveBugV1_05_20_2025_End
 				RetVal = 1;
 			} else if (CInMsg == "MouseInp") {
 				if (cDBase->S_Count == S_initCnt + 1) {
 					if (cDBase->S_Buff[cDBase->S_Count - 1]->iObjType == 3) {
 						E_Object* pE = (E_Object*) cDBase->S_Buff[cDBase->S_Count - 1];
-						// Saeed_Material_SaveBugV1_05_20_2025_Start
-						/*
-						//Saeed_Material_SaveBugV1_05_20_2025_End
-						cDBase->EditMat(pE->PID, TRUE);
-						//Saeed_Material_SaveBugV1_05_20_2025_Start
-						*/
+						// MoMo_Material_SaveBugV1_05_20_2025_Start
+						// MoMo// cDBase->EditMat(pE->PID, TRUE);
 						cDBase->EditMat(pE->PID, TRUE, materialIDFound);
-						// Saeed_Material_SaveBugV1_05_20_2025_End
+						// MoMo_Material_SaveBugV1_05_20_2025_End
 					}
 					RetVal = 1;
 				}
 			}
 		}
-
 		// Escape clause
 		if (iStat == 100) {
 			RetVal = 1;

@@ -1,4 +1,4 @@
-
+﻿
 // M3daDoc.cpp : implementation of the CM3daDoc class
 //
 
@@ -8,12 +8,18 @@
 #include "GLOBAL_VARS.h"
 #include <iostream>
 #include <fstream>
+// #include "G_Object.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 // The data base class
 DBase* cDBase;
 zMnu* pMnu;
+// MoMo_Start
+SeedValues SeedVals;
+CString LastRequest = "";
+// MoMo_End
 
 // CM3daDoc
 
@@ -30,6 +36,10 @@ ON_COMMAND(ID_EDIT_TRANSLATEDFROM, &CM3daDoc::OnEditTranslatedfrom)
 ON_COMMAND(ID_EDIT_FILTERNONE, &CM3daDoc::OnEditFilternone)
 ON_COMMAND(ID_EDIT_CANCEL, &CM3daDoc::OnEditCancel)
 ON_COMMAND(ID_EDIT_DONE, &CM3daDoc::OnEditDone)
+// MoMo_Start
+ON_COMMAND(ID_EDIT_NO, &CM3daDoc::OnEditNo)
+ON_COMMAND(ID_EDIT_YES, &CM3daDoc::OnEditYes)
+// MoMo_End
 ON_COMMAND(ID_GROUP_ADDTOGROUP, &CM3daDoc::OnGroupAddtogroup)
 ON_COMMAND(ID_GROUP_REMOVEFROMGROUP, &CM3daDoc::OnGroupRemovefromgroup)
 ON_COMMAND(ID_GROUP_ADDGROUP, &CM3daDoc::OnGroupAddgroup)
@@ -415,11 +425,13 @@ ON_COMMAND(ID_IMPORT_STLTOTRIMESH, &CM3daDoc::OnImportStltotrimesh)
 ON_COMMAND(ID_IMPORT_IMPORTDXF, &CM3daDoc::OnImportImportdxf)
 ON_COMMAND(ID_VIEW_TOGGLEON33455, &CM3daDoc::OnViewToggleon33455)
 // Esp_Mod_Experimental_Toolbar_4_10_2025_Start: Added functions for new menu items
-ON_COMMAND(ID_EXPERIMENTAL_EXP1, &CM3daDoc::OnEXP01)
-ON_COMMAND(ID_EXPERIMENTAL_EXP2, &CM3daDoc::OnEXP02)
-ON_COMMAND(ID_EXPERIMENTAL_EXP3, &CM3daDoc::OnEXP03)
-ON_COMMAND(ID_EXPERIMENTAL_EXP4, &CM3daDoc::OnEXP04)
-ON_COMMAND(ID_EXPERIMENTAL_EXP5, &CM3daDoc::OnEXP05)
+// MoMo_Start
+// ON_COMMAND(ID_EXPERIMENTAL_EXP1, &CM3daDoc::OnEXP01)
+// ON_COMMAND(ID_EXPERIMENTAL_EXP2, &CM3daDoc::OnEXP02)
+// ON_COMMAND(ID_EXPERIMENTAL_EXP3, &CM3daDoc::OnEXP03)
+// ON_COMMAND(ID_EXPERIMENTAL_EXP4, &CM3daDoc::OnEXP04)
+// ON_COMMAND(ID_EXPERIMENTAL_EXP5, &CM3daDoc::OnEXP05)
+// MoMo_End
 ON_COMMAND(ID_EXP01, &CM3daDoc::OnEXP01)
 ON_COMMAND(ID_EXP02, &CM3daDoc::OnEXP02)
 ON_COMMAND(ID_EXP03, &CM3daDoc::OnEXP03)
@@ -496,8 +508,14 @@ BOOL CM3daDoc::OnNewDocument() {
 	// (SDI documents will reuse this document)
 	if (bOnFirst == FALSE) {
 		InitDoc();
+		// MoMo_Start
+		outtextSprintf("\r\nVersion of New File = %.2f", 0, abs(VERSION_NO / 10.0), false, 1);
+		// MoMo_End
 	} else {
 		bOnFirst = FALSE;
+		// MoMo_Start
+		outtextSprintf("Version of Files = %.2f", 0, abs(VERSION_NO / 10.0), false, 1);
+		// MoMo_End
 	}
 	ReSet();
 	CheckPoint();
@@ -584,8 +602,14 @@ void CM3daDoc::SetScreenMat(CRect rRect) {
 void CM3daDoc::UpTree() {
 	// TODO: Add your command handler code here
 	if (cDBase != NULL) {
-		cDBase->UpTree();
-		outtext1("Up Tree");
+		// MoMo_Start
+		if (!SeedVals.SelectSurfaceCurves) {
+			// MoMo_End
+			cDBase->UpTree();
+			outtext1("Up Tree");
+			// MoMo_Start
+		}
+		// MoMo_End
 	}
 }
 
@@ -811,13 +835,43 @@ void CM3daDoc::OnEditFilternone() {
 
 void CM3daDoc::OnEditCancel() {
 	// TODO: Add your command handler code here
-	outtextMSG2("C");
+	// MoMo_Start
+	if (!SeedVals.IsSeedMode) {
+		// MoMo_End
+		outtextMSG2("C");
+		// MoMo_Start
+	} else {
+		outtextMSG2("Cancel");
+	}
+	// MoMo_End
 }
 
 void CM3daDoc::OnEditDone() {
 	// TODO: Add your command handler code here
-	outtextMSG2("D");
+	// MoMo_Start
+	if (!SeedVals.IsSeedMode) {
+		// MoMo_End
+		outtextMSG2("D");
+		// MoMo_Start
+	} else {
+		outtextMSG2("Done");
+	}
+	// MoMo_End
 }
+
+// MoMo_Start
+void CM3daDoc::OnEditNo() {
+	// TODO: Add your command handler code here
+	outtextMSG2("No");
+}
+// MoMo_End
+
+// MoMo_Start
+void CM3daDoc::OnEditYes() {
+	// TODO: Add your command handler code here
+	outtextMSG2("Yes");
+}
+// MoMo_End
 
 void CM3daDoc::Dsp_Group() {
 	// TODO: Add your command handler code here
@@ -2663,26 +2717,18 @@ void CM3daDoc::OnMaterialIsentropic() {
 		bFinalChkPt = FALSE;
 		// outtextMSG2("MMAT1");
 		// sLastcmd="MMAT1";
-		// Saeed_Material_SaveBugV1_05_20_2025_Start
-		/*
-		//Saeed_Material_SaveBugV1_05_20_2025_End
-		int iNLab = MatT->NextID();
-		//Saeed_Material_SaveBugV1_05_20_2025_Start
-		*/
+		// MoMo_Material_SaveBugV1_05_20_2025_Start
+		// MoMo// int iNLab = MatT->NextID();
 		int iNLab = MatT->OfferedID(0, true, 1); // newIdMode: 1>> Max of current list + 1 2>>Smallest empty room
 		bool materialIDFound;
 		MatT->isTemp = true;
-		// Saeed_Material_SaveBugV1_05_20_2025_End
+		// MoMo_Material_SaveBugV1_05_20_2025_End
 		cDBase->CreateMat1("Al Material", iNLab, gDEF_E, gDEF_V, gDEF_DEN, gDEF_CTE, gDEF_COND);
-		// Saeed_Material_SaveBugV1_05_20_2025_Start
-		/*
-		//Saeed_Material_SaveBugV1_05_20_2025_End
-		 cDBase->EditMat(iNLab,FALSE);
-		//Saeed_Material_SaveBugV1_05_20_2025_Start
-		*/
+		// MoMo_Material_SaveBugV1_05_20_2025_Start
+		// MoMo// cDBase->EditMat(iNLab,FALSE);
 		cDBase->EditMat(iNLab, FALSE, materialIDFound);
 		MatT->isTemp = false;
-		// Saeed_Material_SaveBugV1_05_20_2025_End
+		// MoMo_Material_SaveBugV1_05_20_2025_End
 	} else {
 		outtext1("Finish Current Operation.");
 	}
@@ -4337,6 +4383,21 @@ void CM3daDoc::OnMeshAdvancingfrontsurfacemeshtri() {
 	}
 }
 
+void CM3daDoc::OnEXP04() {
+	// TODO: Add your command handler code here
+	// MoMo_Start
+	if (pMnu->isNULL()) {
+		SetModifiedFlag();
+		CheckPoint();
+		bFinalChkPt = FALSE;
+		outtextMSG2("EXP04");
+		sLastcmd = "EXP04";
+	} else {
+		outtext1("Finish Current Operation. (By: Rightclick >> Cancel)");
+	}
+	// MoMo_End
+}
+
 void CM3daDoc::OnLineMultiline() {
 	// TODO: Add your command handler code here
 	if (pMnu->isNULL()) {
@@ -4551,19 +4612,19 @@ void CM3daDoc::OnMaterialOrthotropic() {
 		bFinalChkPt = FALSE;
 		// outtextMSG2("MMAT8");
 		// sLastcmd = "MMAT8";
-		int iNLab = MatT->NextID();
+		// MoMo_Material_FormKeysBugV1_05_22_2025_Start
+		// MoMo// int iNLab = MatT->NextID();
+		int iNLab = MatT->OfferedID(0, true, 1); // newIdMode: 1>> Max of current list + 1 2>>Smallest empty room
+		bool materialIDFound;
+		MatT->isTemp = true;
+		// MoMo_Material_FormKeysBugV1_05_22_2025_End
 		cDBase->CreateMat8("NASTRAN MAT8 Property", iNLab, 0, 0, 0,
 		                   0, 0, 0, 0,
 		                   0, 0, 0);
-		// Saeed_Material_SaveBugV1_05_20_2025_Start
-		bool materialIDFound;
-		/*
-		//Saeed_Material_SaveBugV1_05_20_2025_End
-		cDBase->EditMat(iNLab, FALSE);
-		//Saeed_Material_SaveBugV1_05_20_2025_Start
-		*/
+		// MoMo_Material_FormKeysBugV1_05_22_2025_Start
+		// MoMo// cDBase->EditMat(iNLab, FALSE);
 		cDBase->EditMat(iNLab, FALSE, materialIDFound);
-		// Saeed_Material_SaveBugV1_05_20_2025_End
+		// MoMo_Material_FormKeysBugV1_05_22_2025_End
 	} else {
 		outtext1("Finish Current Operation.");
 	}
@@ -5563,6 +5624,7 @@ void CM3daDoc::OnViewToggleon33455() {
 
 // Esp_Mod_Experimental_Toolbar_4_10_2025_Start: Added to handle export commands
 void CM3daDoc::OnEXP01() {
+	// TODO: Add your command handler code here
 	////Esp_Mod_Labels_4_27_2025_Start: Toggle display labels
 	gLBL_DSP_TRG = true;
 	cDBase->DspFlags = (cDBase->DspFlags ^ DSP_RESLAB);
@@ -5570,6 +5632,9 @@ void CM3daDoc::OnEXP01() {
 	cDBase->ReDraw();
 	gLBL_DSP_TRG = false;
 	////Esp_Mod_Labels_4_27_2025_End
+	// MoMo_Start
+	// ExportLinesToAutoCADScript(m_pObject, "Lines.scr");
+	// MoMo_End
 }
 
 void CM3daDoc::OnEXP02() {
@@ -5580,11 +5645,67 @@ void CM3daDoc::OnEXP03() {
 	// TODO: Add your command handler code here
 }
 
-void CM3daDoc::OnEXP04() {
-	// TODO: Add your command handler code here
-}
+// MoMo_Start
+// void CM3daDoc::OnEXP04()
+//{
+//  // TODO: Add your command handler code here
+//}
+// MoMo_End
 
 void CM3daDoc::OnEXP05() {
 	// TODO: Add your command handler code here
+	// MoMo_Start
+	if (pMnu->isNULL()) {
+		SetModifiedFlag();
+		CheckPoint();
+		bFinalChkPt = FALSE;
+		outtextMSG2("EXP05");
+		sLastcmd = "EXP05";
+	} else {
+		outtext1("Finish Current Operation. (By: Rightclick >> Cancel)");
+	}
+	// MoMo_End
 }
 // Esp_Mod_Experimental_Toolbar_4_10_2025_End
+
+// MoMo_Start
+// void ExportLinesToAutoCADScript(G_Object* pObject, const std::string& filename)
+//{
+//	if (!pObject)
+//	{
+//		std::cerr << "Invalid object pointer!" << std::endl;
+//		return;
+//	}
+//
+//	std::ofstream outFile(filename);
+//	if (!outFile.is_open())
+//	{
+//		std::cerr << "Cannot open file for writing: " << filename << std::endl;
+//		return;
+//	}
+//
+//	if (pObject->m_LineArray.empty())
+//	{
+//		std::cerr << "No lines found in object." << std::endl;
+//		outFile.close();
+//		return;
+//	}
+//
+//	for (auto pLine : pObject->m_LineArray)
+//	{
+//		if (pLine)
+//		{
+//			outFile << "LINE" << std::endl;
+//			outFile << pLine->m_vS.x << "," << pLine->m_vS.y << "," << pLine->m_vS.z << std::endl;
+//			outFile << pLine->m_vE.x << "," << pLine->m_vE.y << "," << pLine->m_vE.z << std::endl;
+//			outFile << std::endl;
+//		}
+//	}
+//
+//	outFile << "ZOOM" << std::endl;
+//	outFile << "E" << std::endl;
+//
+//	outFile.close();
+//	std::cout << "AutoCAD script generated successfully at: " << filename << std::endl;
+// }
+// MoMo_End

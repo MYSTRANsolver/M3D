@@ -878,13 +878,20 @@ BEGIN
 	
 	// Esp_Mod_Experimental_Toolbar_4_10_2025_Start
 	POPUP "Experimental"
-    BEGIN
-        MENUITEM "EXP 1",                       ID_EXPERIMENTAL_EXP1
-        MENUITEM "EXP 2",                       ID_EXPERIMENTAL_EXP2
-        MENUITEM "EXP 3",                       ID_EXPERIMENTAL_EXP3
-        MENUITEM "EXP 4",                       ID_EXPERIMENTAL_EXP4
-        MENUITEM "EXP 5",                       ID_EXPERIMENTAL_EXP5
-    END
+   BEGIN
+      // MoMo_Start
+      // MENUITEM "EXP 1",                       ID_EXPERIMENTAL_EXP1
+      // MENUITEM "EXP 2",                       ID_EXPERIMENTAL_EXP2
+      // MENUITEM "EXP 3",                       ID_EXPERIMENTAL_EXP3
+      // MENUITEM "EXP 4",                       ID_EXPERIMENTAL_EXP4
+      // MENUITEM "EXP 5",                       ID_EXPERIMENTAL_EXP5
+      MENUITEM "EXP 1", ID_EXP01                      //ID_EXPERIMENTAL_EXP1
+      MENUITEM "EXP 2", ID_EXP02                      //ID_EXPERIMENTAL_EXP2
+      MENUITEM "EXP 3", ID_EXP03                      //ID_EXPERIMENTAL_EXP3
+      MENUITEM "EXP 4", ID_EXP04                      //ID_EXPERIMENTAL_EXP4
+      MENUITEM "EXP 5", ID_EXP05                      //ID_EXPERIMENTAL_EXP5
+      // MoMo_End
+   END
 	// Esp_Mod_Experimental_Toolbar_4_10_2025_End
 	
     POPUP "&Help"
@@ -911,6 +918,10 @@ BEGIN
         MENUITEM "Intersection",                ID_EDIT_IITERSECTION
         MENUITEM "Project",                     ID_EDIT_PROJECT
         MENUITEM "Projected to Workplane",      ID_EDIT_ONSCREENLOCATION
+        // MoMo_Start
+        MENUITEM "No",                          ID_EDIT_NO
+        MENUITEM "Yes",                         ID_EDIT_YES
+        // MoMo_End
         MENUITEM "Cancel",                      ID_EDIT_CANCEL
         MENUITEM "Done",                        ID_EDIT_DONE
     END
@@ -952,7 +963,10 @@ CAPTION "About M3D"
 FONT 12, "Microsoft Sans Serif", 400, 0, 0x0
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
-    LTEXT           "M3D, Version 7.8 09,03,2025 64BIT WIN11",IDC_STATIC,43,14,247,8,SS_NOPREFIX
+    // MoMo_Start
+    // MoMo// LTEXT           "M3D, Version 7.8 09,03,2025 64BIT WIN11",IDC_STATIC,43,14,247,8,SS_NOPREFIX
+    LTEXT           "M3D, Version 7.9 09,03,2025 64BIT WIN11",IDC_STATIC,43,14,247,8,SS_NOPREFIX
+    // MoMo_End
     LTEXT           "Copyright (C) 2010 - 2025",IDC_STATIC,43,26,114,8
     DEFPUSHBUTTON   "OK",IDOK,261,123,50,14,WS_GROUP
     LTEXT           "THE AUTHOR SHALL IN NO EVENT BE LIABLE TO THE USER",IDC_STATIC,42,52,235,8
@@ -1110,16 +1124,28 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    PUSHBUTTON      "Apply Changes",IDOK,41,223,53,14
-    DEFPUSHBUTTON   "Exit",IDCANCEL,97,223,27,14
-    EDITTEXT        IDC_EDIT_FLOAT,7,166,51,12,ES_AUTOHSCROLL | NOT WS_VISIBLE
-    EDITTEXT        IDC_PTITLE,40,13,253,12,ES_AUTOHSCROLL
-    LTEXT           "Title:",IDC_STATIC,17,15,23,11
-    LTEXT           "ID:",IDC_PID,17,25,23,11
-    EDITTEXT        IDC_ENTID,41,25,55,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "List",IDC_ENTLIST,7,223,30,14
-    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,41,285,171,WS_EX_DLGMODALFRAME | WS_EX_LEFTSCROLLBAR | WS_EX_STATICEDGE
-    DEFPUSHBUTTON   "Delete",IDCDELETE,265,223,27,14
+   // MoMo_Material_EnterBugV1_05_21_2025_Start
+   // PUSHBUTTON      "Apply Changes",IDOK,41,223,53,14
+   // DEFPUSHBUTTON   "Exit",IDCANCEL,97,223,27,14
+   // EDITTEXT        IDC_EDIT_FLOAT,7,166,51,12,ES_AUTOHSCROLL | NOT WS_VISIBLE
+   // EDITTEXT        IDC_PTITLE,40,13,253,12,ES_AUTOHSCROLL
+   // LTEXT           "Title:",IDC_STATIC,17,15,23,11
+   // LTEXT           "ID:",IDC_PID,17,25,23,11
+   // EDITTEXT        IDC_ENTID,41,25,55,12,ES_AUTOHSCROLL
+   // PUSHBUTTON      "List",IDC_ENTLIST,7,223,30,14
+   // CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,41,285,171,WS_EX_DLGMODALFRAME | WS_EX_LEFTSCROLLBAR | WS_EX_STATICEDGE
+   // DEFPUSHBUTTON   "Delete",IDCDELETE,265,223,27,14
+   LTEXT           "Title:", IDC_STATIC, 17, 15, 23, 11
+   LTEXT           "ID:", IDC_PID, 17, 25, 23, 11
+   EDITTEXT        IDC_EDIT_FLOAT, 7, 166, 51, 12, ES_AUTOHSCROLL | NOT WS_VISIBLE
+   EDITTEXT        IDC_PTITLE, 40, 13, 253, 12, ES_AUTOHSCROLL
+   EDITTEXT        IDC_ENTID, 41, 25, 55, 12, ES_AUTOHSCROLL
+   CONTROL         "", IDC_LIST1, "SysListView32", LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP, 7, 41, 285, 171, WS_EX_DLGMODALFRAME | WS_EX_LEFTSCROLLBAR | WS_EX_STATICEDGE
+   PUSHBUTTON      "List", IDC_ENTLIST, 7, 223, 30, 14
+   DEFPUSHBUTTON      "Apply Changes", IDOK, 41, 223, 53, 14
+   PUSHBUTTON   "Exit", IDCANCEL, 97, 223, 27, 14
+   PUSHBUTTON   "Delete", IDCDELETE, 265, 223, 27, 14
+   // MoMo_Material_EnterBugV1_05_21_2025_End
 END
 
 IDD_PCOMPEDIT DIALOGEX 0, 0, 285, 278
@@ -2328,6 +2354,17 @@ BEGIN
     ID_EXPORT_EXPORTVIEWMATRIX "Export current view matrix for latter use."
     ID_IMPORT_IMPORTVIEWMATRIX "Import M3D save view matrix."
 END
+
+// MoMo_Start
+STRINGTABLE
+BEGIN
+    ID_EXP01 "Click to check experiment code 1\nEperiment Button 1"
+    ID_EXP02 "Click to check experiment code 2\nEperiment Button 2"
+    ID_EXP03 "Click to check experiment code 3\nEperiment Button 3"
+    ID_EXP04 "Click to check experiment code 4\nEperiment Button 4"
+    ID_EXP05 "Click to check experiment code 5\nEperiment Button 5"
+END
+// MoMo_End
 
 STRINGTABLE
 BEGIN

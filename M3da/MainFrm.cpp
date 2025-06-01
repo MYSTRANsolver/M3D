@@ -1,4 +1,4 @@
-
+﻿
 // MainFrm.cpp : implementation of the CMainFrame class
 //
 
@@ -7,6 +7,10 @@
 
 #include "MainFrm.h"
 
+// MoMo_Start
+#include <afxstr.h>
+#include <vector>
+// MoMo_End
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -277,6 +281,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 	Edit1 = &m_Input.Edit1;
 	Edit2 = &m_Input.Edit2;
 	Edit3 = &m_Input.Edit3;
+	// MoMo_Start
+	SetFontSpec(m_EditFont, 10, _T("Arial"), true, &m_Input.Edit1);
+	SetFontSpec(m_EditFont, 10, _T("Arial"), true, &m_Input.Edit2);
+	SetFontSpec(m_EditFont, 10, _T("Arial"), true, &m_Input.Edit3);
+	// MoMo_End
 	m_Input.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_Input);
 
@@ -465,7 +474,7 @@ void outtext1(CString AAA) {
 	Edit2->LineScroll(NoOff, 0);
 }
 
-// Saeed_Material_SaveBugV1_05_20_2025_Start
+// MoMo_Material_SaveBugV1_05_20_2025_Start
 void outtextSprintf(CString AAA, int intValue, double floatValue, bool IsInt, int nText) {
 	char StOut[100];
 	if (IsInt == 1) {
@@ -475,9 +484,9 @@ void outtextSprintf(CString AAA, int intValue, double floatValue, bool IsInt, in
 	}
 	outtextMultiLine(StOut, nText);
 }
-// Saeed_Material_SaveBugV1_05_20_2025_End
+// MoMo_Material_SaveBugV1_05_20_2025_End
 
-// Saeed_Material_SaveBugV1_05_20_2025_Start
+// MoMo_Material_SaveBugV1_05_20_2025_Start
 void outtextMultiLine(CString AAA, int nText) {
 	std::vector<CString> breakByLines;
 	CString delimiter = "\r\n";
@@ -512,7 +521,7 @@ void outtextMultiLine(CString AAA, int nText) {
 		}
 	}
 }
-// Saeed_Material_SaveBugV1_05_20_2025_End
+// MoMo_Material_SaveBugV1_05_20_2025_End
 
 void outtextMSG(CString AAA) {
 	CString a;

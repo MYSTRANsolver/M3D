@@ -120,6 +120,6 @@ GLubyte const Font1[][13] = {
 
 ////Esp_Mod_Labels_4_27_2025_Start: Added required var for new font system
 extern GLuint g_arialBase; // base list ID
-extern const GLuint g_firstChar; // we'll map ASCII 32–127
-extern const GLuint g_charCount; // 127–32+1
+extern const GLuint g_firstChar; // we'll map ASCII 32-127
+extern const GLuint g_charCount; // 127-32+1
 ////Esp_Mod_Labels_4_27_2025_End

@@ -40,6 +40,9 @@ class C3dVector
 {
 	public:
 		double x, y, z;
+		// MoMo_Start
+		int tempSeedId = 0;
+		// MoMo_End
 		C3dVector();
 		~C3dVector();
 		// C3dVector(const D3DVECTOR& r);

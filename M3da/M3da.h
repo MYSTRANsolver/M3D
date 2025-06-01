@@ -8,9 +8,9 @@
 #endif
 
 #include "resource.h" // main symbols
-// Saeed_Material_SaveBugV1_05_20_2025_Start
+// MoMo_Material_SaveBugV1_05_20_2025_Start
 #include <set>
-// Saeed_Material_SaveBugV1_05_20_2025_End
+// MoMo_Material_SaveBugV1_05_20_2025_End
 
 // CM3daApp:
 // See M3da.cpp for the implementation of this class
@@ -43,10 +43,10 @@ class CM3daApp: public CWinAppEx {
 };
 void outtext1(CString AAA);
 void outtext2(CString AAA);
-// Saeed_Material_SaveBugV1_05_20_2025_Start
+// MoMo_Material_SaveBugV1_05_20_2025_Start
 void outtextSprintf(CString AAA, int intValue, double floatValue, bool IsInt, int iText);
 void outtextMultiLine(CString AAA, int nText);
-// Saeed_Material_SaveBugV1_05_20_2025_End
+// MoMo_Material_SaveBugV1_05_20_2025_End
 void SendMsg(CString AAA);
 void SetFocus();
 void outtextMSG(CString AAA);

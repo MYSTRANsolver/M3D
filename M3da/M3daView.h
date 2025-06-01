@@ -24,6 +24,9 @@ class CM3daView: public CView {
 		int m_iHeight; // client height
 		CRect m_rcClient; // client area in screen coords
 		int m_iFuncKey;
+		// MoMo_Start
+		BOOL m_middleIsDraging = false;
+		// MoMo_End
 		void ClearScr();
 		BOOL bF;
 
