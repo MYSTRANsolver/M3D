@@ -17,3 +17,7 @@ In the two newly added commands for adding and using mesh seeds (which are still
 14- When the user is about to enter a value from the keyboard but accidentally clicks on the screen, a warning is being added in the box on the left (the command report box, in my opinion), and the focus is being moved to the "Command entry text box."
 15- When the user uses the right-click menu to send the "Done" or "Cancel" command, instead of sending the letters "D" or "C", the words "Done" or "Cancel" are being sent in the "command report box", which is helping with better readability and understanding of the steps of previous commands.
 16- I have been trying to provide helpful information in the command report box so that users can complete the steps of this menu more quickly and accurately. Also, if the user is new (as I was in the beginning), this explanation is helping a lot.
+17- When the "Esc" key is pressed in all text boxes, the "Cancel" command is executed.
+18- The Information and Command entry text boxes were locked.
+19- "Control+C" and Control+V added to all text boxes.
+20- Added a buffering option to the View menu with three modes: Auto (adapts to the operating system), SINGLE, and DOUBLE.

@@ -8,6 +8,9 @@
 #include <fstream> // Include the necessary header file
 #include <string>
 #include <atlstr.h>
+// MoMo_Start
+#include "AppSettings.h"
+// MoMo_End
 
 #pragma warning(disable : 4477)
 BOOL gORTHO;
@@ -1657,26 +1660,73 @@ void DBase::Ortho() {
 	}
 }
 
-void DBase::ToggleDoubleBuffering() {
-	// Destroy current context
-	wglMakeCurrent(NULL, NULL);
-	wglDeleteContext(hrc);
-	if (m_pDC != nullptr)
-		pTheView->ReleaseDC(m_pDC);
-	CDC* pDC = pTheView->GetDC();
-	if (pDC != nullptr) {
-		if (gDOUBLEBUFF) {
-			gDOUBLEBUFF = false;
-			InitOGL(pDC);
-			outtext1("Double Buffering OFF.");
-		} else {
-			gDOUBLEBUFF = true;
-			InitOGL(pDC);
-			outtext1("Double Buffering ON.");
-		}
-		InvalidateOGL();
+// MoMo_Start
+// void DBase::ToggleDoubleBuffering() {
+//// Destroy current context
+// wglMakeCurrent(NULL, NULL);
+// wglDeleteContext(hrc);
+// if (m_pDC != nullptr)
+//	pTheView->ReleaseDC(m_pDC);
+// CDC* pDC = pTheView->GetDC();
+// if (pDC != nullptr) {
+//	if (gDOUBLEBUFF) {
+//		gDOUBLEBUFF = false;
+//		InitOGL(pDC);
+//		outtext1("Double Buffering OFF.");
+//	} else {
+//		gDOUBLEBUFF = true;
+//		InitOGL(pDC);
+//		outtext1("Double Buffering ON.");
+//	}
+//	InvalidateOGL();
+// }
+void DBase::ToggleDoubleBuffering(int newMode) {
+	CAppSettings settings;
+	CString newModeString, currentModeString;
+	char S1[200];
+	if (newMode == 0) {
+		newModeString = "Single";
+	} else if (newMode == 1) {
+		newModeString = "Double";
+	} else {
+		newModeString = "Auto";
 	}
+	int currentMode = settings.ToggleDoubleBuffer(newMode);
+	if (currentMode == 0) {
+		currentModeString = "Single";
+	} else if (currentMode == 1) {
+		currentModeString = "Double";
+	} else {
+		currentModeString = "Auto";
+	}
+	sprintf_s(S1, "Double Buffering: Current = %s, Restart = %s\r\nPlease restart the application to apply changes.", currentModeString, newModeString);
+	outtext1(_T(S1));
+	// MoMo_End
 }
+
+// MoMo_Start
+void DBase::ListDoubleBuffering() {
+	CAppSettings settings;
+	CString resultModeString;
+	int currentValue = 0;
+	int resultValue = 0;
+	char S1[200];
+	settings.CurrentBuffer(currentValue, resultValue);
+	if (currentValue == 0) {
+		strcpy(S1, "Buffering: Current = Single");
+	} else if (currentValue == 1) {
+		strcpy(S1, "Buffering: Current = Double");
+	} else {
+		if (resultValue == 0) {
+			resultModeString = "Single";
+		} else if (resultValue == 1) {
+			resultModeString = "Double";
+		}
+		sprintf_s(S1, "Buffering: Current = Auto, Result = %s", resultModeString);
+	}
+	outtext1(_T(S1));
+}
+// MoMo_End
 
 void DBase::CreateWP(double dWPSize) {
 	WP_Object* TheWP = new WP_Object;
@@ -13290,13 +13340,24 @@ int DBase::GetFastView() {
 }
 
 BOOL DBase::bSetupPixelFormat(bool bDBLEBUFF) {
+	// MoMo_Start
+	CAppSettings settings;
+	BOOL bUseDoubleBuffer = settings.ReadDoubleBuffer();
+	DWORD dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_TYPE_RGBA; // support window | upport OpenGL | RGBA type
+	if (bUseDoubleBuffer) {
+		dwFlags |= PFD_DOUBLEBUFFER; // double buffered
+	}
+	// MoMo_End
 	static PIXELFORMATDESCRIPTOR pfd =
 	    {
 	        sizeof(PIXELFORMATDESCRIPTOR), // size of this pfd
 	        1, // version number
-	        PFD_DRAW_TO_WINDOW | // support window
-	            PFD_SUPPORT_OPENGL, // support OpenGL
-	        PFD_TYPE_RGBA, // RGBA type
+	        // MoMo_Start
+	        // PFD_DRAW_TO_WINDOW | // support window
+	        //    PFD_SUPPORT_OPENGL, // support OpenGL
+	        // PFD_TYPE_RGBA, // RGBA type
+	        dwFlags,
+	        // MoMo_End
 	        24, // 24-bit color depth
 	        0, 0, 0, 0, 0, 0, // color bits ignored
 	        0, // no alpha buffer

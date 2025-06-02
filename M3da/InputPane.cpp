@@ -52,6 +52,11 @@ int CInputPane::OnCreate(LPCREATESTRUCT lpCreateStruct) {
 	Edit3.SetFont(&m_Font);
 	// Esp_Mod_Font_End
 
+	// MoMo_Start
+	Edit1.SetReadOnly(TRUE);
+	Edit2.SetReadOnly(TRUE);
+	// MoMo_End
+
 	return 0;
 }
 

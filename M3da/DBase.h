@@ -28,7 +28,11 @@ class DBase: public CCmdTarget {
 		void ModIncludeNo(int iF);
 		void ModLayerNo(int iF);
 		void Ortho();
-		void ToggleDoubleBuffering();
+		// MoMo_Start
+		// MoMo// void ToggleDoubleBuffering();
+		void ToggleDoubleBuffering(int newMode);
+		void ListDoubleBuffering();
+		// MoMo_End
 		void LabGaps(int iGap);
 		HGLRC hrc;
 		// Dynamic draging object

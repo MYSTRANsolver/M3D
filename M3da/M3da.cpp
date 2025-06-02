@@ -18,6 +18,11 @@
 #define new DEBUG_NEW
 #endif
 
+// MoMo_Start
+SeedValues SeedVals;
+CString LastRequest = "";
+// MoMo_End
+
 // CM3daApp
 
 BEGIN_MESSAGE_MAP(CM3daApp, CWinAppEx)
@@ -179,7 +184,10 @@ BOOL CM3daApp::InitInstance() {
 	// Change the registry key under which our settings are stored
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization
-	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
+	// MoMo_Start
+	// MoMo// SetRegistryKey(_T("Local AppWizard-Generated Applications"));
+	SetRegistryKey(_T("M3D-DevM-Reg-1"));
+	// MoMo_End
 	LoadStdProfileSettings(4); // Load standard INI file options (including MRU)
 
 	InitContextMenuManager();

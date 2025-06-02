@@ -416,6 +416,15 @@ BEGIN
         BEGIN
             MENUITEM "<placeholder>",               ID_VIEW_TOOLBAR
         END
+        // MoMo_Start
+        POPUP "BUFFERING - Affects Display"
+        BEGIN
+            MENUITEM "Auto", ID_TOGGLE_BUFFER_AUTO 
+            MENUITEM "Single", ID_TOGGLE_BUFFER_SINGLE
+            MENUITEM "Double", ID_TOGGLE_BUFFER_DOUBLE 
+            MENUITEM "List Current State", ID_TOGGLE_BUFFER_LIST 
+        END
+        // MoMo_End
         MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
         MENUITEM "HighLight Limit",             ID_VIEW_HIGHLIGHTLIMIT
         POPUP "VIEW"
@@ -2154,7 +2163,13 @@ BEGIN
     ID_QFILTER_ALL2         "Export Tri mesh to STL file."
     ID_ELEMENTTYPE_BUSH2    "Import text STL file to tri mesh."
     ID_EDIT_GLOBALPREFERENCES2 "Import Autocad 2d geometry DXF file."
-    ID_LOADSBC_CREATETEMPD2 "Toggle On/Off Double Buffering"
+    // MoMo_Start
+    // MoMo// ID_LOADSBC_CREATETEMPD2 "Toggle On/Off Double Buffering"
+    ID_TOGGLE_BUFFER_AUTO "Auto"
+    ID_TOGGLE_BUFFER_DOUBLE "Single"
+    ID_TOGGLE_BUFFER_SINGLE "Double"
+    ID_TOGGLE_BUFFER_LIST "List Current State"
+    // MoMo_End
 END
 
 STRINGTABLE

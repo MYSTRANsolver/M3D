@@ -4,6 +4,9 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+// MoMo_Start
+#include "AppSettings.h"
+// MoMo_End
 // #include <windows.h>
 using namespace std;
 // START OF GLOBAL VARIABLES - TRYING THIS OUT 22/09/2023
@@ -51745,14 +51748,25 @@ void CEntEditDialog::Build2(BOOL isPCOMPG) {
 }
 
 void CEntEditDialog::InitOGL() {
+	// MoMo_Start
+	CAppSettings settings;
+	BOOL bUseDoubleBuffer = settings.ReadDoubleBuffer();
+	DWORD dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_TYPE_RGBA; // support window | upport OpenGL | RGBA type
+	if (bUseDoubleBuffer) {
+		dwFlags |= PFD_DOUBLEBUFFER; // double buffered
+	}
+	// MoMo_End
 	static PIXELFORMATDESCRIPTOR pfd =
 	    {
 	        sizeof(PIXELFORMATDESCRIPTOR), // size of this pfd
 	        1, // version number
-	        PFD_DRAW_TO_WINDOW | // support window
-	            PFD_SUPPORT_OPENGL | // support OpenGL
-	                                 // PFD_DOUBLEBUFFER,             // double buffered
-	            PFD_TYPE_RGBA, // RGBA type
+	        // MoMo_Start
+	        // PFD_DRAW_TO_WINDOW | // support window
+	        //    PFD_SUPPORT_OPENGL | // support OpenGL
+	        // PFD_DOUBLEBUFFER,             // double buffered
+	        //    PFD_TYPE_RGBA, // RGBA type
+	        dwFlags,
+	        // MoMo_End
 	        24, // 24-bit color depth
 	        0, 0, 0, 0, 0, 0, // color bits ignored
 	        0, // no alpha buffer
@@ -52402,14 +52416,25 @@ void CPcompEditor::Build() {
 }
 
 void CPcompEditor::InitOGL() {
+	// MoMo_Start
+	CAppSettings settings;
+	BOOL bUseDoubleBuffer = settings.ReadDoubleBuffer();
+	DWORD dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_TYPE_RGBA; // support window | upport OpenGL | RGBA type
+	if (bUseDoubleBuffer) {
+		dwFlags |= PFD_DOUBLEBUFFER; // double buffered
+	}
+	// MoMo_End
 	static PIXELFORMATDESCRIPTOR pfd =
 	    {
 	        sizeof(PIXELFORMATDESCRIPTOR), // size of this pfd
 	        1, // version number
-	        PFD_DRAW_TO_WINDOW | // support window
-	            PFD_SUPPORT_OPENGL | // support OpenGL
-	                                 // PFD_DOUBLEBUFFER,             // double buffered
-	            PFD_TYPE_RGBA, // RGBA type
+	        // MoMo_Start
+	        //PFD_DRAW_TO_WINDOW | // support window
+	        //    PFD_SUPPORT_OPENGL | // support OpenGL
+	        //    PFD_DOUBLEBUFFER, // double buffered
+	        //PFD_TYPE_RGBA, // RGBA type
+	        dwFlags,
+	        // MoMo_End
 	        24, // 24-bit color depth
 	        0, 0, 0, 0, 0, 0, // color bits ignored
 	        0, // no alpha buffer

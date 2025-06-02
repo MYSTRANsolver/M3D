@@ -16,10 +16,6 @@
 // The data base class
 DBase* cDBase;
 zMnu* pMnu;
-// MoMo_Start
-SeedValues SeedVals;
-CString LastRequest = "";
-// MoMo_End
 
 // CM3daDoc
 
@@ -423,7 +419,13 @@ ON_COMMAND(ID_LOADSBC_CREATEGRAV, &CM3daDoc::OnLoadsbcCreategrav)
 ON_COMMAND(ID_EXPORT_CURRENT_STL, &CM3daDoc::OnExportCurrentStl)
 ON_COMMAND(ID_IMPORT_STLTOTRIMESH, &CM3daDoc::OnImportStltotrimesh)
 ON_COMMAND(ID_IMPORT_IMPORTDXF, &CM3daDoc::OnImportImportdxf)
-ON_COMMAND(ID_VIEW_TOGGLEON33455, &CM3daDoc::OnViewToggleon33455)
+// MoMo_Start
+// MoMo// ON_COMMAND(ID_VIEW_TOGGLEON33455, &CM3daDoc::OnViewToggleon33455)
+ON_COMMAND(ID_TOGGLE_BUFFER_AUTO, &CM3daDoc::OnViewToggleBufferAuto)
+ON_COMMAND(ID_TOGGLE_BUFFER_SINGLE, &CM3daDoc::OnViewToggleBufferSingle)
+ON_COMMAND(ID_TOGGLE_BUFFER_DOUBLE, &CM3daDoc::OnViewToggleBufferDouble)
+ON_COMMAND(ID_TOGGLE_BUFFER_LIST, &CM3daDoc::OnViewToggleBufferList)
+// MoMo_End
 // Esp_Mod_Experimental_Toolbar_4_10_2025_Start: Added functions for new menu items
 // MoMo_Start
 // ON_COMMAND(ID_EXPERIMENTAL_EXP1, &CM3daDoc::OnEXP01)
@@ -514,6 +516,7 @@ BOOL CM3daDoc::OnNewDocument() {
 	} else {
 		bOnFirst = FALSE;
 		// MoMo_Start
+		outtext1("If you experience display problems, change the BUFFER option in the VIEW menu.");
 		outtextSprintf("Version of Files = %.2f", 0, abs(VERSION_NO / 10.0), false, 1);
 		// MoMo_End
 	}
@@ -5617,10 +5620,31 @@ void CM3daDoc::OnImportImportdxf() {
 	}
 }
 
-void CM3daDoc::OnViewToggleon33455() {
+// MoMo_Start
+//void CM3daDoc::OnViewToggleon33455() {
+//	// TODO: Add your command handler code here
+//}
+
+void CM3daDoc::OnViewToggleBufferAuto() {
 	// TODO: Add your command handler code here
-	cDBase->ToggleDoubleBuffering();
+	cDBase->ToggleDoubleBuffering(2);
 }
+
+void CM3daDoc::OnViewToggleBufferSingle() {
+	// TODO: Add your command handler code here
+	cDBase->ToggleDoubleBuffering(0);
+}
+
+void CM3daDoc::OnViewToggleBufferDouble() {
+	// TODO: Add your command handler code here
+	cDBase->ToggleDoubleBuffering(1);
+}
+
+void CM3daDoc::OnViewToggleBufferList() {
+	// TODO: Add your command handler code here
+	cDBase->ListDoubleBuffering();
+}
+// MoMo_End
 
 // Esp_Mod_Experimental_Toolbar_4_10_2025_Start: Added to handle export commands
 void CM3daDoc::OnEXP01() {

@@ -119,6 +119,9 @@
     <ClInclude Include="3dsupport.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="AppSettings.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="M3da.idl">

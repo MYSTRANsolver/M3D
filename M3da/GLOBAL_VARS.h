@@ -1,4 +1,15 @@
 #pragma once
+
+// MoMo_Start
+#include <windows.h>
+#include <afx.h>
+class DSP_Triad;
+class Symbol;
+class PropTable;
+class MatTable;
+// MoMo_End
+
+
 extern int gBACKGRD_COL;
 extern bool gDOUBLEBUFF;
 extern double gZOOM_SCL;

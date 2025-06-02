@@ -587,7 +587,13 @@ class CM3daDoc: public CDocument, public CUndo {
 
 	public:
 		afx_msg void OnImportImportdxf();
-		afx_msg void OnViewToggleon33455();
+		// MoMo_Start
+		// MoMo// afx_msg void OnViewToggleon33455();
+		afx_msg void OnViewToggleBufferAuto();
+		afx_msg void OnViewToggleBufferSingle();
+		afx_msg void OnViewToggleBufferDouble();
+		afx_msg void OnViewToggleBufferList();
+		// MoMo_Start
 		// Esp_Mod_Experimental_Toolbar_4_10_2025_Start: Added experimental menu items
 		afx_msg void OnEXP01();
 		afx_msg void OnEXP02();
