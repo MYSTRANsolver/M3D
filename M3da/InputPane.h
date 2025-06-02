@@ -4,43 +4,39 @@
 #include "EditBasic.h"
 
 // Esp_Mod_Remove_Buttons_Start: Added A custom CMFCTabCtrl class than hides the scroll bar.
-class CMyTabCtrl : public CMFCTabCtrl
-{
-public:
-	// Override AdjustTabs to clear the scroll area
-	virtual void AdjustTabs()
-	{
-		m_bScroll = FALSE;
-		CMFCTabCtrl::AdjustTabs();
-	}
+class CMyTabCtrl: public CMFCTabCtrl {
+	public:
+		// Override AdjustTabs to clear the scroll area
+		virtual void AdjustTabs() {
+			m_bScroll = FALSE;
+			CMFCTabCtrl::AdjustTabs();
+		}
 };
 // Esp_Mod_Remove_Buttons_End
 
 // CInputPane
 
-class CInputPane : public CDockablePane
-{
-	DECLARE_DYNAMIC(CInputPane)
+class CInputPane: public CDockablePane {
+		DECLARE_DYNAMIC(CInputPane)
 
-public:
-	CInputPane();
-	virtual ~CInputPane();
-	// Esp_Mod_Remove_Buttons_Start: Added A custom CMFCTabCtrl class than hides the scroll bar.
-	CMyTabCtrl	m_wndTabs;
-	// Esp_Mod_Remove_Buttons_End
-	
-	// Esp_Mod_Font_Start: Added CFont object for the font
-	CFont m_Font;
-	// Esp_Mod_Font_End
-	CEditBasic Edit1;
-	CEditBasic Edit2;
-	CMyEdit Edit3;
+	public:
+		CInputPane();
+		virtual ~CInputPane();
+		// Esp_Mod_Remove_Buttons_Start: Added A custom CMFCTabCtrl class than hides the scroll bar.
+		CMyTabCtrl m_wndTabs;
+		// Esp_Mod_Remove_Buttons_End
 
-protected:
-	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	//  afx_msg void OnClose();
+		// Esp_Mod_Font_Start: Added CFont object for the font
+		CFont m_Font;
+		// Esp_Mod_Font_End
+		CEditBasic Edit1;
+		CEditBasic Edit2;
+		CMyEdit Edit3;
+
+	protected:
+		DECLARE_MESSAGE_MAP()
+	public:
+		afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+		afx_msg void OnSize(UINT nType, int cx, int cy);
+		//  afx_msg void OnClose();
 };
-

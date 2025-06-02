@@ -1,4 +1,15 @@
 #pragma once
+
+// MoMo_Start
+#include <windows.h>
+#include <afx.h>
+class DSP_Triad;
+class Symbol;
+class PropTable;
+class MatTable;
+// MoMo_End
+
+
 extern int gBACKGRD_COL;
 extern bool gDOUBLEBUFF;
 extern double gZOOM_SCL;
@@ -19,6 +30,18 @@ extern double gDIM_RADSZ;
 extern double gDIM_CVORD;
 extern BOOL gDSP_CPTS;
 extern BOOL gDSP_CIRS;
+// MoMo_Start
+struct SeedValues {
+		BOOL IsSeedMode = FALSE;
+		BOOL SelectSurface = TRUE;
+		BOOL SelectSurfaceCurves = FALSE;
+		BOOL SelectLock = FALSE;
+		double InputedMeshElementSize = 1.0;
+		int InputedSeedNumbers = 0;
+};
+extern SeedValues SeedVals;
+extern CString LastRequest;
+// MoMo_End
 extern BOOL gDSP_BACK;
 extern BOOL gORTHO;
 extern DSP_Triad tOrient;
@@ -29,8 +52,8 @@ extern Symbol* pSymTable[10000];
 extern int gDIM_PREC;
 extern double gDIM_SIZE;
 extern int gCUR_RES;
-extern double gDRILL_KS;          //K value for shell drilling
-extern double gRIGID_MULTIPLIER;  //multiplier to factor psuedo rigid elemenys K values
+extern double gDRILL_KS; // K value for shell drilling
+extern double gRIGID_MULTIPLIER; // multiplier to factor psuedo rigid elemenys K values
 extern double gVSTIFF_KS;
 extern double gDEF_E;
 extern double gDEF_V;
@@ -42,6 +65,7 @@ extern double gDEF_THERM_LNK;
 extern double gDEF_SOL_TOL;
 extern PropTable* PropsT;
 extern MatTable* MatT;
-//Esp_Mod_Labels_4_27_2025_Start: Added global var for label display
+
+// Esp_Mod_Labels_4_27_2025_Start: Added global var for label display
 extern bool gLBL_DSP_TRG;
-//Esp_Mod_Labels_4_27_2025_End
+// Esp_Mod_Labels_4_27_2025_End
